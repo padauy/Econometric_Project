@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="author" content="Luis Pérez (luispepa@uv.es)">
+<meta name="dcterms.date" content="2023-01-12">
+<meta name="description" content="Universidad Carlos III de Madrid Econometrics 1">
+<title>Analyzing Titanic Passenger Data to Understand Survival Patterns</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<script src="titanic_files/libs/clipboard/clipboard.min.js"></script>
+<script src="titanic_files/libs/quarto-html/quarto.js"></script>
+<script src="titanic_files/libs/quarto-html/popper.min.js"></script>
+<script src="titanic_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="titanic_files/libs/quarto-html/anchor.min.js"></script>
+<link href="titanic_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="titanic_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="titanic_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="titanic_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="titanic_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><style>html{ scroll-behavior: smooth; }</style>
+<style>
+    .quarto-title-block .quarto-title-banner {
+      color: #FFFFFF;
+background: #022E4B;
+    }
+    </style>
+<script src="titanic_files/libs/htmlwidgets-1.5.4/htmlwidgets.js"></script><script src="titanic_files/libs/plotly-binding-4.10.0/plotly.js"></script><script src="titanic_files/libs/typedarray-0.1/typedarray.min.js"></script><script src="titanic_files/libs/jquery-3.5.1/jquery.min.js"></script><link href="titanic_files/libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet">
+<script src="titanic_files/libs/crosstalk-1.2.0/js/crosstalk.min.js"></script><link href="titanic_files/libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="titanic_files/libs/plotly-main-2.5.1/plotly-latest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+</head>
+<body>
+
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full"><div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <div class="quarto-title-block"><div><h1 class="title">Analyzing Titanic Passenger Data to Understand Survival Patterns</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+                  <div>
+        <div class="description">
+          <p>Universidad Carlos III de Madrid Econometrics 1</p>
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Econometrics I</div>
+                <div class="quarto-category">UC3M</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Luis Pérez (luispepa@uv.es) </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 12, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  </ul></nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content"><div class="cell">
+<style type="text/css">
+.justify {
+  text-align: justify !important
+}
+</style>
+</div>
+<section id="introduction" class="level2"><h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<div class="justify">
+<p>The sinking of the Titanic stands as a pivotal event in history, prompting extensive scholarly investigation into the factors influencing passenger survival. This project utilizes the titanic.csv dataset, accessible at https://stanford.io/2O9RUCF, to scrutinize socioeconomic variables and identify patterns contributing to survival, treating it as a binary outcome.</p>
+<p>Our objectives include data exploration and visualization, analyzing age density distributions conditioned on survival to ascertain its predictive value. Subsequently, we employ modeling techniques such as the linear probability model, logistic regression, and probit regression to explore nuanced relationships between survival and socioeconomic factors.</p>
+<section id="data" class="level3"><h3 class="anchored" data-anchor-id="data">Data</h3>
+<div class="cell">
+<details><summary>Code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org">readr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://plotly-r.com">plotly</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jrnold/ggthemes">ggthemes</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/calligross/ggthemeassist">ggThemeAssist</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/taiyun/corrplot">corrplot</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">AER</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">Titanic_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"https://stanford.io/2O9RUCF"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">Titanic_2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+<pre><code>    Survived          Pclass          Name               Sex           
+ Min.   :0.0000   Min.   :1.000   Length:887         Length:887        
+ 1st Qu.:0.0000   1st Qu.:2.000   Class :character   Class :character  
+ Median :0.0000   Median :3.000   Mode  :character   Mode  :character  
+ Mean   :0.3856   Mean   :2.306                                        
+ 3rd Qu.:1.0000   3rd Qu.:3.000                                        
+ Max.   :1.0000   Max.   :3.000                                        
+      Age        Siblings/Spouses Aboard Parents/Children Aboard
+ Min.   : 0.42   Min.   :0.0000          Min.   :0.0000         
+ 1st Qu.:20.25   1st Qu.:0.0000          1st Qu.:0.0000         
+ Median :28.00   Median :0.0000          Median :0.0000         
+ Mean   :29.47   Mean   :0.5254          Mean   :0.3833         
+ 3rd Qu.:38.00   3rd Qu.:1.0000          3rd Qu.:0.0000         
+ Max.   :80.00   Max.   :8.0000          Max.   :6.0000         
+      Fare        
+ Min.   :  0.000  
+ 1st Qu.:  7.925  
+ Median : 14.454  
+ Mean   : 32.305  
+ 3rd Qu.: 31.137  
+ Max.   :512.329  </code></pre>
+</div>
+</div>
+<p>In the dataset, we observe information for 887 passengers distributed across 8 columns. Notably, the “Survived” column contains binary data, taking the value of 1 if the individual survived and 0 otherwise. The “PClass” column indicates the class in which the individual traveled, with three distinct classes available. The “Name” column is deemed irrelevant for our analysis. Additionally, key demographic details include the passenger’s gender (“Sex”), age (“Age”), the presence of siblings aboard (“Siblings”), the count of parents aboard (“Parents”), and the cost of the ticket in British pounds (“Fare”).</p>
+<p>The bar chart illustrates the relative proportions of survivors and casualties based on gender. Among females, a higher proportion survived, while among males, a greater number experienced fatalities.</p>
+<div class="cell">
+<details><summary>Code</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">Titanic_2</span> <span class="op">&lt;-</span> <span class="va">Titanic_2</span><span class="op">[</span>, <span class="op">-</span><span class="fl">3</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">Titanic_2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Survived"</span>, <span class="st">"Class"</span>, <span class="st">"Sex"</span>, <span class="st">"Age"</span>, <span class="st">"Siblings"</span>, <span class="st">"Parents"</span>, <span class="st">"Fare"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">t_abs</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">Titanic_2</span><span class="op">$</span><span class="va">Survived</span>, <span class="va">Titanic_2</span><span class="op">$</span><span class="va">Class</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># CORRELATION BETWEEN</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/corrplot/man/corrplot.html">corrplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cor</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select_all.html">select_if</a></span><span class="op">(</span><span class="va">Titanic_2</span>, <span class="va">is.numeric</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+<p><img src="titanic_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As evident from the preceding plot, it is notable that the most pronounced correlation exists between the fare and passenger class. This correlation suggests a discernible pattern that can be anticipated or forecasted.</p>
+<p>We can employ density estimates to examine the distribution of age conditional on survival and the distribution of class on survival. This analysis aims to discern potential indications of how age and class are associated with the likelihood of survival. Notably, despite the dataset reporting ages as integers, we treat age as a continuous variable in this context. An intriguing aspect to explore is whether there are observable patterns that shed light on the effectiveness of the ‘women and children first’ policy in influencing survival outcomes.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="titanic_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Analyzing the preceding graph, it is evident that approximately 20% of the passengers belonged to the first class, another 20% to the second class, with nearly half of them unfortunately not surviving. In contrast, passengers in the third class constituted just under 60%, and regrettably, almost 80% of them did not survive, representing 40% of the total passengers.</p>
+<div class="cell">
+<details><summary>Code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">#data1 &lt;- Titanic_2 %&gt;%</span></span>
+<span> <span class="co">#   group_by(Survived, Sex) %&gt;%</span></span>
+<span>  <span class="co">#  summarize(Frequency = n()) %&gt;%</span></span>
+<span>   <span class="co"># group_by(Sex) %&gt;%</span></span>
+<span>    <span class="co">##mutate(Proportion = Frequency / sum(Frequency))</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co">## Cambiar el orden de los factores en el eje y</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co">## Convertir Proportion a factor</span></span>
+<span></span>
+<span><span class="co"># Crear el gráfico de barras apiladas</span></span>
+<span></span>
+<span><span class="co">#ggplot(data1, aes(x = Sex, y = Proportion, fill = as.factor(Survived))) +</span></span>
+<span> <span class="co">#   geom_bar(stat = "identity", position = "stack", width = 0.7) +</span></span>
+<span>  <span class="co">#  scale_fill_manual(values = c("#009AFF", "#022E4B")) +</span></span>
+<span>   <span class="co"># labs(title = "Frequency of Survival by Gender",</span></span>
+<span>    <span class="co">#     x = "Sex",</span></span>
+<span>     <span class="co">#    y = "Frequency",</span></span>
+<span>      <span class="co">#   fill = "Survived") +</span></span>
+<span>    <span class="co">#theme_minimal()</span></span>
+<span><span class="co"># Mostrar el gráfico</span></span>
+<span><span class="va">data1</span> <span class="op">&lt;-</span> <span class="va">Titanic_2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">Survived</span>, <span class="va">Sex</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>Frequency <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">Sex</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>Proportion <span class="op">=</span> <span class="va">Frequency</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">Frequency</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Cambiar el orden de los factores en el eje y</span></span>
+<span></span>
+<span><span class="co"># Convertir Proportion a factor</span></span>
+<span></span>
+<span><span class="co"># Crear el gráfico de barras apiladas</span></span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">data1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Sex</span>, y <span class="op">=</span> <span class="va">Proportion</span>, fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">Survived</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span>, position <span class="op">=</span> <span class="st">"stack"</span>, width <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"#009AFF"</span>, <span class="st">"#022E4B"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Frequency of Survival by Gender"</span>,</span>
+<span>         x <span class="op">=</span> <span class="st">"Sex"</span>,</span>
+<span>         y <span class="op">=</span> <span class="st">"Frequency"</span>,</span>
+<span>         fill <span class="op">=</span> <span class="st">"Survived"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+<p><img src="titanic_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The bar chart illustrates the relative proportion of survival and mortality based on gender. Among females, a higher proportion survived( about 75%), while among males, a greater proportion did not survive(less than 25%).</p>
+<p>Density estimates are employed to analyze the distribution of Age conditioned on survival, aiming to discern any indications of how age may be related to the likelihood of survival.</p>
+<div class="cell">
+<details><summary>Code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># DENSITY DISTRIBUTION </span></span>
+<span></span>
+<span><span class="co"># Estimate both densities</span></span>
+<span><span class="va">dens_age_surv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/density.html">density</a></span><span class="op">(</span><span class="va">Titanic_2</span><span class="op">$</span><span class="va">Age</span><span class="op">[</span><span class="va">Titanic_2</span><span class="op">$</span><span class="va">Survived</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">dens_age_died</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/density.html">density</a></span><span class="op">(</span><span class="va">Titanic_2</span><span class="op">$</span><span class="va">Age</span><span class="op">[</span><span class="va">Titanic_2</span><span class="op">$</span><span class="va">Survived</span> <span class="op">==</span> <span class="fl">0</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Combine data into a single data frame for ggplot</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
+<span>        x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">dens_age_surv</span><span class="op">$</span><span class="va">x</span>, <span class="va">dens_age_died</span><span class="op">$</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>        y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">dens_age_surv</span><span class="op">$</span><span class="va">y</span>, <span class="va">dens_age_died</span><span class="op">$</span><span class="va">y</span><span class="op">)</span>,</span>
+<span>        group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Survived"</span>, <span class="st">"Died"</span><span class="op">)</span>, each <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">dens_age_surv</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Find the maximum y value for setting ylim</span></span>
+<span><span class="va">max_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create ggplot with a more appealing style</span></span>
+<span><span class="va">g</span><span class="op">&lt;-</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, color <span class="op">=</span> <span class="va">group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">ylim</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">max_y</span> <span class="op">*</span> <span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span>  <span class="co"># Adjust ylim to accommodate the highest density</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
+<span>                title <span class="op">=</span> <span class="st">"Density Estimates of 'Age'"</span>,</span>
+<span>                x <span class="op">=</span> <span class="st">"Age"</span>,</span>
+<span>                y <span class="op">=</span> <span class="st">"Density"</span>,</span>
+<span>                caption <span class="op">=</span> <span class="st">"Data source: Titanic_2"</span></span>
+<span>        <span class="op">)</span> <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Survived"</span> <span class="op">=</span> <span class="st">"#C4961A"</span>, <span class="st">"Died"</span> <span class="op">=</span> <span class="st">"#576d8d"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>                plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">16</span>, face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span>,</span>
+<span>                axis.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">14</span><span class="op">)</span>,</span>
+<span>                axis.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>,</span>
+<span>                legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>                legend.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
+<span>        <span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>axis.line <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>    linetype <span class="op">=</span> <span class="st">"solid"</span><span class="op">)</span>, axis.ticks <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_line</a></span><span class="op">(</span>linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"Chart crafted by the author."</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html">ggplotly</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+<div id="htmlwidget-0565925fea68022f4781" style="width:100%;height:464px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0565925fea68022f4781">{"x":{"data":[{"x":[-9.2861338285014,-9.10301784482821,-8.91990186115501,-8.73678587748182,-8.55366989380862,-8.37055391013543,-8.18743792646223,-8.00432194278904,-7.82120595911584,-7.63808997544265,-7.45497399176945,-7.27185800809626,-7.08874202442306,-6.90562604074986,-6.72251005707667,-6.53939407340347,-6.35627808973028,-6.17316210605708,-5.99004612238389,-5.80693013871069,-5.6238141550375,-5.4406981713643,-5.25758218769111,-5.07446620401791,-4.89135022034472,-4.70823423667152,-4.52511825299833,-4.34200226932513,-4.15888628565193,-3.97577030197874,-3.79265431830554,-3.60953833463235,-3.42642235095915,-3.24330636728596,-3.06019038361276,-2.87707439993957,-2.69395841626637,-2.51084243259318,-2.32772644891998,-2.14461046524679,-1.96149448157359,-1.7783784979004,-1.5952625142272,-1.41214653055401,-1.22903054688081,-1.04591456320762,-0.86279857953442,-0.679682595861225,-0.496566612188028,-0.313450628514833,-0.130334644841637,0.0527813388315579,0.235897322504753,0.419013306177948,0.602129289851144,0.785245273524339,0.968361257197534,1.15147724087073,1.33459322454392,1.51770920821712,1.70082519189032,1.88394117556351,2.06705715923671,2.2501731429099,2.4332891265831,2.61640511025629,2.79952109392949,2.98263707760268,3.16575306127588,3.34886904494907,3.53198502862227,3.71510101229546,3.89821699596866,4.08133297964185,4.26444896331505,4.44756494698824,4.63068093066144,4.81379691433463,4.99691289800783,5.18002888168103,5.36314486535422,5.54626084902742,5.72937683270061,5.91249281637381,6.095608800047,6.2787247837202,6.46184076739339,6.64495675106659,6.82807273473978,7.01118871841298,7.19430470208617,7.37742068575937,7.56053666943256,7.74365265310576,7.92676863677895,8.10988462045215,8.29300060412535,8.47611658779854,8.65923257147174,8.84234855514493,9.02546453881813,9.20858052249132,9.39169650616452,9.57481248983771,9.75792847351091,9.9410444571841,10.1241604408573,10.3072764245305,10.4903924082037,10.6735083918769,10.8566243755501,11.0397403592233,11.2228563428965,11.4059723265697,11.5890883102429,11.7722042939161,11.9553202775893,12.1384362612624,12.3215522449356,12.5046682286088,12.687784212282,12.8709001959552,13.0540161796284,13.2371321633016,13.4202481469748,13.603364130648,13.7864801143212,13.9695960979944,14.1527120816676,14.3358280653408,14.518944049014,14.7020600326872,14.8851760163604,15.0682920000336,15.2514079837068,15.43452396738,15.6176399510532,15.8007559347264,15.9838719183995,16.1669879020727,16.3501038857459,16.5332198694191,16.7163358530923,16.8994518367655,17.0825678204387,17.2656838041119,17.4487997877851,17.6319157714583,17.8150317551315,17.9981477388047,18.1812637224779,18.3643797061511,18.5474956898243,18.7306116734975,18.9137276571707,19.0968436408439,19.2799596245171,19.4630756081903,19.6461915918635,19.8293075755367,20.0124235592098,20.195539542883,20.3786555265562,20.5617715102294,20.7448874939026,20.9280034775758,21.111119461249,21.2942354449222,21.4773514285954,21.6604674122686,21.8435833959418,22.026699379615,22.2098153632882,22.3929313469614,22.5760473306346,22.7591633143078,22.942279297981,23.1253952816542,23.3085112653274,23.4916272490006,23.6747432326737,23.8578592163469,24.0409752000201,24.2240911836933,24.4072071673665,24.5903231510397,24.7734391347129,24.9565551183861,25.1396711020593,25.3227870857325,25.5059030694057,25.6890190530789,25.8721350367521,26.0552510204253,26.2383670040985,26.4214829877717,26.6045989714449,26.7877149551181,26.9708309387913,27.1539469224645,27.3370629061377,27.5201788898109,27.703294873484,27.8864108571572,28.0695268408304,28.2526428245036,28.4357588081768,28.61887479185,28.8019907755232,28.9851067591964,29.1682227428696,29.3513387265428,29.534454710216,29.7175706938892,29.9006866775624,30.0838026612356,30.2669186449088,30.450034628582,30.6331506122552,30.8162665959284,30.9993825796016,31.1824985632748,31.365614546948,31.5487305306211,31.7318465142943,31.9149624979675,32.0980784816407,32.2811944653139,32.4643104489871,32.6474264326603,32.8305424163335,33.0136584000067,33.1967743836799,33.3798903673531,33.5630063510263,33.7461223346995,33.9292383183727,34.1123543020459,34.2954702857191,34.4785862693923,34.6617022530655,34.8448182367387,35.0279342204119,35.2110502040851,35.3941661877583,35.5772821714314,35.7603981551046,35.9435141387778,36.126630122451,36.3097461061242,36.4928620897974,36.6759780734706,36.8590940571438,37.042210040817,37.2253260244902,37.4084420081634,37.5915579918366,37.7746739755098,37.957789959183,38.1409059428562,38.3240219265294,38.5071379102026,38.6902538938758,38.873369877549,39.0564858612222,39.2396018448954,39.4227178285686,39.6058338122417,39.7889497959149,39.9720657795881,40.1551817632613,40.3382977469345,40.5214137306077,40.7045297142809,40.8876456979541,41.0707616816273,41.2538776653005,41.4369936489737,41.6201096326469,41.8032256163201,41.9863415999933,42.1694575836665,42.3525735673397,42.5356895510129,42.7188055346861,42.9019215183593,43.0850375020325,43.2681534857056,43.4512694693788,43.634385453052,43.8175014367252,44.0006174203984,44.1837334040716,44.3668493877448,44.549965371418,44.7330813550912,44.9161973387644,45.0993133224376,45.2824293061108,45.465545289784,45.6486612734572,45.8317772571304,46.0148932408036,46.1980092244768,46.38112520815,46.5642411918232,46.7473571754964,46.9304731591696,47.1135891428427,47.2967051265159,47.4798211101891,47.6629370938623,47.8460530775355,48.0291690612087,48.2122850448819,48.3954010285551,48.5785170122283,48.7616329959015,48.9447489795747,49.1278649632479,49.3109809469211,49.4940969305943,49.6772129142675,49.8603288979407,50.0434448816139,50.2265608652871,50.4096768489603,50.5927928326335,50.7759088163067,50.9590247999799,51.142140783653,51.3252567673262,51.5083727509994,51.6914887346726,51.8746047183458,52.057720702019,52.2408366856922,52.4239526693654,52.6070686530386,52.7901846367118,52.973300620385,53.1564166040582,53.3395325877314,53.5226485714046,53.7057645550778,53.888880538751,54.0719965224242,54.2551125060974,54.4382284897706,54.6213444734438,54.804460457117,54.9875764407901,55.1706924244633,55.3538084081365,55.5369243918097,55.7200403754829,55.9031563591561,56.0862723428293,56.2693883265025,56.4525043101757,56.6356202938489,56.8187362775221,57.0018522611953,57.1849682448685,57.3680842285417,57.5512002122149,57.7343161958881,57.9174321795613,58.1005481632345,58.2836641469077,58.4667801305809,58.6498961142541,58.8330120979273,59.0161280816004,59.1992440652736,59.3823600489468,59.56547603262,59.7485920162932,59.9317079999664,60.1148239836396,60.2979399673128,60.481055950986,60.6641719346592,60.8472879183324,61.0304039020056,61.2135198856788,61.396635869352,61.5797518530252,61.7628678366984,61.9459838203716,62.1290998040448,62.312215787718,62.4953317713912,62.6784477550644,62.8615637387375,63.0446797224107,63.2277957060839,63.4109116897571,63.5940276734303,63.7771436571035,63.9602596407767,64.1433756244499,64.3264916081231,64.5096075917963,64.6927235754695,64.8758395591427,65.0589555428159,65.2420715264891,65.4251875101623,65.6083034938355,65.7914194775087,65.9745354611819,66.1576514448551,66.3407674285283,66.5238834122015,66.7069993958746,66.8901153795479,67.073231363221,67.2563473468942,67.4394633305674,67.6225793142406,67.8056952979138,67.988811281587,68.1719272652602,68.3550432489334,68.5381592326066,68.7212752162798,68.904391199953,69.0875071836262,69.2706231672994,69.4537391509726,69.6368551346458,69.819971118319,70.0030871019922,70.1862030856654,70.3693190693386,70.5524350530117,70.735551036685,70.9186670203581,71.1017830040313,71.2848989877045,71.4680149713777,71.6511309550509,71.8342469387241,72.0173629223973,72.2004789060705,72.3835948897437,72.5667108734169,72.7498268570901,72.9329428407633,73.1160588244365,73.2991748081097,73.4822907917829,73.6654067754561,73.8485227591293,74.0316387428025,74.2147547264757,74.3978707101489,74.5809866938221,74.7641026774952,74.9472186611684,75.1303346448416,75.3134506285148,75.496566612188,75.6796825958612,75.8627985795344,76.0459145632076,76.2290305468808,76.412146530554,76.5952625142272,76.7783784979004,76.9614944815736,77.1446104652468,77.32772644892,77.5108424325932,77.6939584162664,77.8770743999396,78.0601903836128,78.243306367286,78.4264223509591,78.6095383346323,78.7926543183055,78.9757703019787,79.1588862856519,79.3420022693251,79.5251182529983,79.7082342366715,79.8913502203447,80.0744662040179,80.2575821876911,80.4406981713643,80.6238141550375,80.8069301387107,80.9900461223839,81.1731621060571,81.3562780897303,81.5393940734035,81.7225100570767,81.9056260407499,82.0887420244231,82.2718580080962,82.4549739917694,82.6380899754426,82.8212059591158,83.004321942789,83.1874379264622,83.3705539101354,83.5536698938086,83.7367858774818,83.919901861155,84.1030178448282,84.2861338285014],"y":[1.2729196888087e-05,1.51345855830073e-05,1.7906509739456e-05,2.10838727116103e-05,2.47071066861127e-05,2.90580137203201e-05,3.40335385479579e-05,3.96807410546309e-05,4.60601449405265e-05,5.34440041793658e-05,6.19546314570549e-05,7.15149617616704e-05,8.22082255156856e-05,9.41910273157794e-05,0.000108061174723581,0.000123476038619788,0.00014053963724671,0.000159357461457771,0.00018066128605161,0.000204328340347334,0.000230245931352258,0.000258529694631585,0.000289633883314183,0.000324224098459551,0.000361684068007705,0.000402120894226763,0.000445639855151288,0.000493597208815064,0.00054509958115646,0.000600072174411192,0.000658582962170272,0.000721427517013318,0.000788751211263401,0.000859783418137373,0.000934527493164179,0.00101308253495764,0.0010967091890827,0.0011839011841719,0.00127457745546718,0.00136864899837944,0.00146683535602794,0.00156845093428208,0.00167286552567344,0.00177990348705689,0.00188958946402541,0.00200196333250152,0.00211603378461815,0.00223155972475938,0.00234829596912673,0.00246611408426415,0.00258431183449907,0.00270256804739055,0.00282061829424878,0.00293802486835994,0.00305420991592615,0.0031690650603153,0.00328235710638071,0.00339384793215453,0.00350230767757574,0.00360830334286606,0.00371167575841356,0.00381227391662645,0.00390917534269767,0.00400242152108866,0.0040924406588305,0.00417917745044417,0.004262323501636,0.00434098280629636,0.00441630317832614,0.00448831632643982,0.00455706041830284,0.00462159672917781,0.00468279286214968,0.00474103396161861,0.00479641330033526,0.00484864168403919,0.00489764723549072,0.00494426763085471,0.00498862086864936,0.00503082623823738,0.00507032089870225,0.00510805543642034,0.00514419682315477,0.00517887659597305,0.00521199512490839,0.00524388812447519,0.00527495488069384,0.00530535856933733,0.00533525776317877,0.00536494374419198,0.00539481630447154,0.005425114491261,0.00545608686550751,0.00548847594215968,0.00552268325981011,0.00555894869208073,0.00559765305754501,0.00563966457425701,0.00568644571889511,0.00573768416202241,0.00579392282860922,0.00585571914687896,0.00592649326828544,0.00600524359051848,0.00609238290287848,0.00618861236936378,0.00629693141860505,0.00641901110070444,0.00655347864973302,0.0067011044287745,0.0068631336271688,0.00704630915615115,0.00724600458046176,0.00746293727717917,0.00769781185226776,0.00795681724821013,0.00823857715310468,0.00854096448323689,0.00886446668867647,0.00921186954194721,0.00958839972646568,0.00998751566517313,0.0104093486856264,0.0108539932518681,0.0113293520685186,0.0118286991232645,0.0123502063175612,0.0128935090269391,0.0134617917950702,0.0140550343910327,0.0146674126158902,0.0152980829041617,0.0159462758133819,0.0166164911313135,0.0173004071735323,0.0179967611381615,0.0187042600283084,0.0194232602839317,0.0201500573738659,0.0208816032053435,0.0216163385445138,0.0223525741558948,0.0230869719716714,0.0238174236909392,0.0245422966215193,0.0252599620964168,0.0259647618452433,0.0266560661407726,0.0273332525066778,0.0279948542624664,0.0286363906398298,0.0292531745322552,0.0298485737492409,0.0304214765696917,0.0309708094380011,0.0314849801969246,0.0319722448525133,0.0324323927398042,0.0328648557528135,0.0332625470836413,0.0336260560379246,0.0339606097831457,0.0342661956024259,0.034541212535211,0.0347774871732078,0.0349858140822413,0.0351666929913815,0.0353206632228276,0.0354408848450029,0.0355336894734843,0.0356028942915874,0.0356494009276106,0.0356715440435405,0.0356682354538393,0.0356466568746298,0.0356078718799579,0.0355529487259006,0.0354782456860008,0.0353904487101868,0.0352911350316341,0.0351812930510534,0.0350603171344732,0.0349299695320843,0.0347929538947513,0.0346499971881823,0.0345016557185188,0.0343475028020401,0.0341899211328244,0.0340292743629248,0.0338658926446579,0.0336994722201904,0.0335306033109469,0.0333596131757652,0.033186478363661,0.0330108786594818,0.0328320294194253,0.0326503567169622,0.0324655948829305,0.0322774642873449,0.032084103765185,0.0318860235047339,0.0316831318219638,0.0314750983274555,0.0312604952901375,0.0310384133855812,0.0308099244280667,0.0305748214601437,0.030332841902187,0.0300810138543014,0.0298220990069438,0.0295561344709614,0.0292831821980925,0.0290016874726793,0.0287127068612238,0.028417647445668,0.0281168462326935,0.0278102815855774,0.0274976448787898,0.0271812342854532,0.0268615972172874,0.0265392941343374,0.0262146805192454,0.0258893261192994,0.0255640156513602,0.0252393806395412,0.024916454053893,0.0245967092176665,0.0242803456539261,0.0239679268889885,0.023660005302199,0.0233595819830424,0.0230653588375591,0.0227776509386278,0.0224968242282031,0.0222250156298115,0.0219623819773037,0.0217077286491818,0.0214611864854301,0.0212233639078989,0.0209967502359356,0.0207783512779295,0.0205680710718794,0.0203657958201154,0.020173641149202,0.0199896923224614,0.0198128226349183,0.0196427508618984,0.0194799662042323,0.0193246823654329,0.019174723084891,0.019029715803311,0.0188892833312335,0.0187542776543077,0.018622664317272,0.0184939121090496,0.0183676377387513,0.0182437382412046,0.0181214664190361,0.0180000791479442,0.0178792497325078,0.0177586481421363,0.0176376657708721,0.017515979629211,0.0173933607068563,0.0172695898632319,0.0171439781032661,0.0170164307804511,0.0168870250052376,0.0167556553087234,0.0166219874827587,0.0164854939340076,0.016346795038188,0.0162058880462959,0.0160627781551613,0.0159167454760731,0.0157685155379242,0.0156182892429809,0.0154661414039868,0.0153118494144947,0.0151555287326858,0.0149977040351561,0.0148384818067153,0.0146779553712543,0.0145158868302673,0.0143529000731792,0.0141890995296817,0.0140245880456228,0.0138593614458731,0.0136936580553781,0.0135276490820518,0.0133614136759137,0.0131950263663083,0.013028605688826,0.0128622521770963,0.0126960188552149,0.0125299568001243,0.0123642181056446,0.0121988184902143,0.0120337744522125,0.0118691224493558,0.0117049774461495,0.0115414546618229,0.011378478373435,0.0112160850602254,0.01105431173944,0.0108935035037278,0.0107334642210613,0.0105742341967782,0.010415862079762,0.0102586376091996,0.0101026244802002,0.00994771579470901,0.00979397386038959,0.00964154758487201,0.00949094807062896,0.00934181096640815,0.0091942067437041,0.0090482061162871,0.00890444369470892,0.00876271062009751,0.00862289178737474,0.00848505496814674,0.00834956434431611,0.00821684862470191,0.00808639042247539,0.0079582441077102,0.00783246247086646,0.00771005359013192,0.00759024144488823,0.00747297641183264,0.00735828932470253,0.00724676501377786,0.00713842585286529,0.00703274542946047,0.00692972931123415,0.00682948633598533,0.00673289966578311,0.00663895226962407,0.00654762563044794,0.00645889932870473,0.00637346293584922,0.00629086424409853,0.00621073018328442,0.00613302195866157,0.00605795975007509,0.00598589135857608,0.00591605056001464,0.00584838736473537,0.00578285112130387,0.0057200874748405,0.00565938682931547,0.00560057746935659,0.00554360478482869,0.00548872586340933,0.00543589798224884,0.0053846639670656,0.0053349688960216,0.00528678031684424,0.00524053421114629,0.0051955849013504,0.00515187741623942,0.00510935667942568,0.00506823078004404,0.00502827218562501,0.00498925293440893,0.00495111562635714,0.00491386663555055,0.00487756405276481,0.00484188178781051,0.00480675831645377,0.00477213173842334,0.004738036015475,0.00470425223226203,0.00467068327469597,0.00463726417840346,0.00460392245188166,0.00457052490843324,0.00453699084373918,0.0045032569909093,0.00446926050781524,0.00443474956389513,0.00439977103848262,0.00436427378933414,0.00432820534863879,0.00429134500494165,0.00425364242618155,0.00421517610659174,0.00417591287809935,0.00413576406581082,0.00409444314891254,0.00405223042541408,0.00400911951322643,0.00396510665616485,0.00391991952866206,0.00387376721328397,0.00382676729927265,0.00377894638266273,0.00373023412422023,0.00368061194301068,0.00363034680698297,0.00357949227886735,0.00352810395899151,0.00347611766406577,0.00342380260349001,0.00337124200992133,0.00331850620728439,0.00326567622410188,0.00321290004286149,0.00316026271003418,0.00310783199165134,0.00305569107284227,0.00300407509114899,0.00295293048454779,0.00290230365665744,0.00285223824162973,0.0028029641304238,0.002754431941906,0.00270657377750395,0.00265939682124053,0.00261298187041432,0.00256742930875604,0.00252250659060552,0.00247818214930385,0.00243442129355271,0.00239133095277943,0.00234866623041139,0.0023063406075016,0.00226429318709042,0.00222247615054948,0.00218075714064982,0.00213902551301684,0.00209721562196524,0.00205525753348473,0.00201295114909041,0.00197030338394029,0.00192726723069737,0.00188379844147108,0.00183971521321659,0.00179502040138933,0.00174977648065807,0.00170397599286917,0.00165756502612168,0.00161043955880495,0.00156280945308795,0.00151470772394809,0.00146617070352151,0.001417148201307,0.00136783635329768,0.00131832832805274,0.00126869070295138,0.00121900736842346,0.00116943586416831,0.00112006581469988,0.00107097675038416,0.00102224859357538,0.000974220318589718,0.000926823753099361,0.000880130839564917,0.000834214334429727,0.000789381612919178,0.000745703768757459,0.000703082525833031,0.00066157026454544,0.00062130254584037,0.000582696529275019,0.000545378269030239,0.000509373747497154,0.000474706569225454,0.000441829647360887,0.000410471472909258,0.000380494005183424,0.000351895674733191,0.000324865665129247,0.000299556578287391,0.000275575082349555,0.000252900215517256,0.000231509608075633,0.000211839108300887,0.000193391197198209,0.000176098287823974,0.00015992691604407,0.000145061390026775,0.000131408322068908,0.000118716835952118,0.000106949345867994,9.61054083172778e-05,8.63827983466883e-05,7.74185696341409e-05,6.91763469316668e-05,6.16200692718357e-05,5.48806608646401e-05,4.87890053737196e-05,4.3234107221103e-05,3.81847215788252e-05,3.36601314339501e-05,2.96800255008691e-05,2.60801522449068e-05,2.28354882122594e-05,1.99215806617403e-05,1.74084802586284e-05,1.51672924533633e-05,1.31641727382238e-05,1.13809461646558e-05,9.83293356171545e-06,8.49394841057537e-06,7.30710012173166e-06,6.25970951425692e-06,5.34193174362741e-06,4.57516864332716e-06,3.9010315511402e-06,3.31120691961084e-06,2.79770036697266e-06],"text":["x:  -9.28613383<br />y: 1.272920e-05","x:  -9.10301784<br />y: 1.513459e-05","x:  -8.91990186<br />y: 1.790651e-05","x:  -8.73678588<br />y: 2.108387e-05","x:  -8.55366989<br />y: 2.470711e-05","x:  -8.37055391<br />y: 2.905801e-05","x:  -8.18743793<br />y: 3.403354e-05","x:  -8.00432194<br />y: 3.968074e-05","x:  -7.82120596<br />y: 4.606014e-05","x:  -7.63808998<br />y: 5.344400e-05","x:  -7.45497399<br />y: 6.195463e-05","x:  -7.27185801<br />y: 7.151496e-05","x:  -7.08874202<br />y: 8.220823e-05","x:  -6.90562604<br />y: 9.419103e-05","x:  -6.72251006<br />y: 1.080612e-04","x:  -6.53939407<br />y: 1.234760e-04","x:  -6.35627809<br />y: 1.405396e-04","x:  -6.17316211<br />y: 1.593575e-04","x:  -5.99004612<br />y: 1.806613e-04","x:  -5.80693014<br />y: 2.043283e-04","x:  -5.62381416<br />y: 2.302459e-04","x:  -5.44069817<br />y: 2.585297e-04","x:  -5.25758219<br />y: 2.896339e-04","x:  -5.07446620<br />y: 3.242241e-04","x:  -4.89135022<br />y: 3.616841e-04","x:  -4.70823424<br />y: 4.021209e-04","x:  -4.52511825<br />y: 4.456399e-04","x:  -4.34200227<br />y: 4.935972e-04","x:  -4.15888629<br />y: 5.450996e-04","x:  -3.97577030<br />y: 6.000722e-04","x:  -3.79265432<br />y: 6.585830e-04","x:  -3.60953833<br />y: 7.214275e-04","x:  -3.42642235<br />y: 7.887512e-04","x:  -3.24330637<br />y: 8.597834e-04","x:  -3.06019038<br />y: 9.345275e-04","x:  -2.87707440<br />y: 1.013083e-03","x:  -2.69395842<br />y: 1.096709e-03","x:  -2.51084243<br />y: 1.183901e-03","x:  -2.32772645<br />y: 1.274577e-03","x:  -2.14461047<br />y: 1.368649e-03","x:  -1.96149448<br />y: 1.466835e-03","x:  -1.77837850<br />y: 1.568451e-03","x:  -1.59526251<br />y: 1.672866e-03","x:  -1.41214653<br />y: 1.779903e-03","x:  -1.22903055<br />y: 1.889589e-03","x:  -1.04591456<br />y: 2.001963e-03","x:  -0.86279858<br />y: 2.116034e-03","x:  -0.67968260<br />y: 2.231560e-03","x:  -0.49656661<br />y: 2.348296e-03","x:  -0.31345063<br />y: 2.466114e-03","x:  -0.13033464<br />y: 2.584312e-03","x:   0.05278134<br />y: 2.702568e-03","x:   0.23589732<br />y: 2.820618e-03","x:   0.41901331<br />y: 2.938025e-03","x:   0.60212929<br />y: 3.054210e-03","x:   0.78524527<br />y: 3.169065e-03","x:   0.96836126<br />y: 3.282357e-03","x:   1.15147724<br />y: 3.393848e-03","x:   1.33459322<br />y: 3.502308e-03","x:   1.51770921<br />y: 3.608303e-03","x:   1.70082519<br />y: 3.711676e-03","x:   1.88394118<br />y: 3.812274e-03","x:   2.06705716<br />y: 3.909175e-03","x:   2.25017314<br />y: 4.002422e-03","x:   2.43328913<br />y: 4.092441e-03","x:   2.61640511<br />y: 4.179177e-03","x:   2.79952109<br />y: 4.262324e-03","x:   2.98263708<br />y: 4.340983e-03","x:   3.16575306<br />y: 4.416303e-03","x:   3.34886904<br />y: 4.488316e-03","x:   3.53198503<br />y: 4.557060e-03","x:   3.71510101<br />y: 4.621597e-03","x:   3.89821700<br />y: 4.682793e-03","x:   4.08133298<br />y: 4.741034e-03","x:   4.26444896<br />y: 4.796413e-03","x:   4.44756495<br />y: 4.848642e-03","x:   4.63068093<br />y: 4.897647e-03","x:   4.81379691<br />y: 4.944268e-03","x:   4.99691290<br />y: 4.988621e-03","x:   5.18002888<br />y: 5.030826e-03","x:   5.36314487<br />y: 5.070321e-03","x:   5.54626085<br />y: 5.108055e-03","x:   5.72937683<br />y: 5.144197e-03","x:   5.91249282<br />y: 5.178877e-03","x:   6.09560880<br />y: 5.211995e-03","x:   6.27872478<br />y: 5.243888e-03","x:   6.46184077<br />y: 5.274955e-03","x:   6.64495675<br />y: 5.305359e-03","x:   6.82807273<br />y: 5.335258e-03","x:   7.01118872<br />y: 5.364944e-03","x:   7.19430470<br />y: 5.394816e-03","x:   7.37742069<br />y: 5.425114e-03","x:   7.56053667<br />y: 5.456087e-03","x:   7.74365265<br />y: 5.488476e-03","x:   7.92676864<br />y: 5.522683e-03","x:   8.10988462<br />y: 5.558949e-03","x:   8.29300060<br />y: 5.597653e-03","x:   8.47611659<br />y: 5.639665e-03","x:   8.65923257<br />y: 5.686446e-03","x:   8.84234856<br />y: 5.737684e-03","x:   9.02546454<br />y: 5.793923e-03","x:   9.20858052<br />y: 5.855719e-03","x:   9.39169651<br />y: 5.926493e-03","x:   9.57481249<br />y: 6.005244e-03","x:   9.75792847<br />y: 6.092383e-03","x:   9.94104446<br />y: 6.188612e-03","x:  10.12416044<br />y: 6.296931e-03","x:  10.30727642<br />y: 6.419011e-03","x:  10.49039241<br />y: 6.553479e-03","x:  10.67350839<br />y: 6.701104e-03","x:  10.85662438<br />y: 6.863134e-03","x:  11.03974036<br />y: 7.046309e-03","x:  11.22285634<br />y: 7.246005e-03","x:  11.40597233<br />y: 7.462937e-03","x:  11.58908831<br />y: 7.697812e-03","x:  11.77220429<br />y: 7.956817e-03","x:  11.95532028<br />y: 8.238577e-03","x:  12.13843626<br />y: 8.540964e-03","x:  12.32155224<br />y: 8.864467e-03","x:  12.50466823<br />y: 9.211870e-03","x:  12.68778421<br />y: 9.588400e-03","x:  12.87090020<br />y: 9.987516e-03","x:  13.05401618<br />y: 1.040935e-02","x:  13.23713216<br />y: 1.085399e-02","x:  13.42024815<br />y: 1.132935e-02","x:  13.60336413<br />y: 1.182870e-02","x:  13.78648011<br />y: 1.235021e-02","x:  13.96959610<br />y: 1.289351e-02","x:  14.15271208<br />y: 1.346179e-02","x:  14.33582807<br />y: 1.405503e-02","x:  14.51894405<br />y: 1.466741e-02","x:  14.70206003<br />y: 1.529808e-02","x:  14.88517602<br />y: 1.594628e-02","x:  15.06829200<br />y: 1.661649e-02","x:  15.25140798<br />y: 1.730041e-02","x:  15.43452397<br />y: 1.799676e-02","x:  15.61763995<br />y: 1.870426e-02","x:  15.80075593<br />y: 1.942326e-02","x:  15.98387192<br />y: 2.015006e-02","x:  16.16698790<br />y: 2.088160e-02","x:  16.35010389<br />y: 2.161634e-02","x:  16.53321987<br />y: 2.235257e-02","x:  16.71633585<br />y: 2.308697e-02","x:  16.89945184<br />y: 2.381742e-02","x:  17.08256782<br />y: 2.454230e-02","x:  17.26568380<br />y: 2.525996e-02","x:  17.44879979<br />y: 2.596476e-02","x:  17.63191577<br />y: 2.665607e-02","x:  17.81503176<br />y: 2.733325e-02","x:  17.99814774<br />y: 2.799485e-02","x:  18.18126372<br />y: 2.863639e-02","x:  18.36437971<br />y: 2.925317e-02","x:  18.54749569<br />y: 2.984857e-02","x:  18.73061167<br />y: 3.042148e-02","x:  18.91372766<br />y: 3.097081e-02","x:  19.09684364<br />y: 3.148498e-02","x:  19.27995962<br />y: 3.197224e-02","x:  19.46307561<br />y: 3.243239e-02","x:  19.64619159<br />y: 3.286486e-02","x:  19.82930758<br />y: 3.326255e-02","x:  20.01242356<br />y: 3.362606e-02","x:  20.19553954<br />y: 3.396061e-02","x:  20.37865553<br />y: 3.426620e-02","x:  20.56177151<br />y: 3.454121e-02","x:  20.74488749<br />y: 3.477749e-02","x:  20.92800348<br />y: 3.498581e-02","x:  21.11111946<br />y: 3.516669e-02","x:  21.29423544<br />y: 3.532066e-02","x:  21.47735143<br />y: 3.544088e-02","x:  21.66046741<br />y: 3.553369e-02","x:  21.84358340<br />y: 3.560289e-02","x:  22.02669938<br />y: 3.564940e-02","x:  22.20981536<br />y: 3.567154e-02","x:  22.39293135<br />y: 3.566824e-02","x:  22.57604733<br />y: 3.564666e-02","x:  22.75916331<br />y: 3.560787e-02","x:  22.94227930<br />y: 3.555295e-02","x:  23.12539528<br />y: 3.547825e-02","x:  23.30851127<br />y: 3.539045e-02","x:  23.49162725<br />y: 3.529114e-02","x:  23.67474323<br />y: 3.518129e-02","x:  23.85785922<br />y: 3.506032e-02","x:  24.04097520<br />y: 3.492997e-02","x:  24.22409118<br />y: 3.479295e-02","x:  24.40720717<br />y: 3.465000e-02","x:  24.59032315<br />y: 3.450166e-02","x:  24.77343913<br />y: 3.434750e-02","x:  24.95655512<br />y: 3.418992e-02","x:  25.13967110<br />y: 3.402927e-02","x:  25.32278709<br />y: 3.386589e-02","x:  25.50590307<br />y: 3.369947e-02","x:  25.68901905<br />y: 3.353060e-02","x:  25.87213504<br />y: 3.335961e-02","x:  26.05525102<br />y: 3.318648e-02","x:  26.23836700<br />y: 3.301088e-02","x:  26.42148299<br />y: 3.283203e-02","x:  26.60459897<br />y: 3.265036e-02","x:  26.78771496<br />y: 3.246559e-02","x:  26.97083094<br />y: 3.227746e-02","x:  27.15394692<br />y: 3.208410e-02","x:  27.33706291<br />y: 3.188602e-02","x:  27.52017889<br />y: 3.168313e-02","x:  27.70329487<br />y: 3.147510e-02","x:  27.88641086<br />y: 3.126050e-02","x:  28.06952684<br />y: 3.103841e-02","x:  28.25264282<br />y: 3.080992e-02","x:  28.43575881<br />y: 3.057482e-02","x:  28.61887479<br />y: 3.033284e-02","x:  28.80199078<br />y: 3.008101e-02","x:  28.98510676<br />y: 2.982210e-02","x:  29.16822274<br />y: 2.955613e-02","x:  29.35133873<br />y: 2.928318e-02","x:  29.53445471<br />y: 2.900169e-02","x:  29.71757069<br />y: 2.871271e-02","x:  29.90068668<br />y: 2.841765e-02","x:  30.08380266<br />y: 2.811685e-02","x:  30.26691864<br />y: 2.781028e-02","x:  30.45003463<br />y: 2.749764e-02","x:  30.63315061<br />y: 2.718123e-02","x:  30.81626660<br />y: 2.686160e-02","x:  30.99938258<br />y: 2.653929e-02","x:  31.18249856<br />y: 2.621468e-02","x:  31.36561455<br />y: 2.588933e-02","x:  31.54873053<br />y: 2.556402e-02","x:  31.73184651<br />y: 2.523938e-02","x:  31.91496250<br />y: 2.491645e-02","x:  32.09807848<br />y: 2.459671e-02","x:  32.28119447<br />y: 2.428035e-02","x:  32.46431045<br />y: 2.396793e-02","x:  32.64742643<br />y: 2.366001e-02","x:  32.83054242<br />y: 2.335958e-02","x:  33.01365840<br />y: 2.306536e-02","x:  33.19677438<br />y: 2.277765e-02","x:  33.37989037<br />y: 2.249682e-02","x:  33.56300635<br />y: 2.222502e-02","x:  33.74612233<br />y: 2.196238e-02","x:  33.92923832<br />y: 2.170773e-02","x:  34.11235430<br />y: 2.146119e-02","x:  34.29547029<br />y: 2.122336e-02","x:  34.47858627<br />y: 2.099675e-02","x:  34.66170225<br />y: 2.077835e-02","x:  34.84481824<br />y: 2.056807e-02","x:  35.02793422<br />y: 2.036580e-02","x:  35.21105020<br />y: 2.017364e-02","x:  35.39416619<br />y: 1.998969e-02","x:  35.57728217<br />y: 1.981282e-02","x:  35.76039816<br />y: 1.964275e-02","x:  35.94351414<br />y: 1.947997e-02","x:  36.12663012<br />y: 1.932468e-02","x:  36.30974611<br />y: 1.917472e-02","x:  36.49286209<br />y: 1.902972e-02","x:  36.67597807<br />y: 1.888928e-02","x:  36.85909406<br />y: 1.875428e-02","x:  37.04221004<br />y: 1.862266e-02","x:  37.22532602<br />y: 1.849391e-02","x:  37.40844201<br />y: 1.836764e-02","x:  37.59155799<br />y: 1.824374e-02","x:  37.77467398<br />y: 1.812147e-02","x:  37.95778996<br />y: 1.800008e-02","x:  38.14090594<br />y: 1.787925e-02","x:  38.32402193<br />y: 1.775865e-02","x:  38.50713791<br />y: 1.763767e-02","x:  38.69025389<br />y: 1.751598e-02","x:  38.87336988<br />y: 1.739336e-02","x:  39.05648586<br />y: 1.726959e-02","x:  39.23960184<br />y: 1.714398e-02","x:  39.42271783<br />y: 1.701643e-02","x:  39.60583381<br />y: 1.688703e-02","x:  39.78894980<br />y: 1.675566e-02","x:  39.97206578<br />y: 1.662199e-02","x:  40.15518176<br />y: 1.648549e-02","x:  40.33829775<br />y: 1.634680e-02","x:  40.52141373<br />y: 1.620589e-02","x:  40.70452971<br />y: 1.606278e-02","x:  40.88764570<br />y: 1.591675e-02","x:  41.07076168<br />y: 1.576852e-02","x:  41.25387767<br />y: 1.561829e-02","x:  41.43699365<br />y: 1.546614e-02","x:  41.62010963<br />y: 1.531185e-02","x:  41.80322562<br />y: 1.515553e-02","x:  41.98634160<br />y: 1.499770e-02","x:  42.16945758<br />y: 1.483848e-02","x:  42.35257357<br />y: 1.467796e-02","x:  42.53568955<br />y: 1.451589e-02","x:  42.71880553<br />y: 1.435290e-02","x:  42.90192152<br />y: 1.418910e-02","x:  43.08503750<br />y: 1.402459e-02","x:  43.26815349<br />y: 1.385936e-02","x:  43.45126947<br />y: 1.369366e-02","x:  43.63438545<br />y: 1.352765e-02","x:  43.81750144<br />y: 1.336141e-02","x:  44.00061742<br />y: 1.319503e-02","x:  44.18373340<br />y: 1.302861e-02","x:  44.36684939<br />y: 1.286225e-02","x:  44.54996537<br />y: 1.269602e-02","x:  44.73308136<br />y: 1.252996e-02","x:  44.91619734<br />y: 1.236422e-02","x:  45.09931332<br />y: 1.219882e-02","x:  45.28242931<br />y: 1.203377e-02","x:  45.46554529<br />y: 1.186912e-02","x:  45.64866127<br />y: 1.170498e-02","x:  45.83177726<br />y: 1.154145e-02","x:  46.01489324<br />y: 1.137848e-02","x:  46.19800922<br />y: 1.121609e-02","x:  46.38112521<br />y: 1.105431e-02","x:  46.56424119<br />y: 1.089350e-02","x:  46.74735718<br />y: 1.073346e-02","x:  46.93047316<br />y: 1.057423e-02","x:  47.11358914<br />y: 1.041586e-02","x:  47.29670513<br />y: 1.025864e-02","x:  47.47982111<br />y: 1.010262e-02","x:  47.66293709<br />y: 9.947716e-03","x:  47.84605308<br />y: 9.793974e-03","x:  48.02916906<br />y: 9.641548e-03","x:  48.21228504<br />y: 9.490948e-03","x:  48.39540103<br />y: 9.341811e-03","x:  48.57851701<br />y: 9.194207e-03","x:  48.76163300<br />y: 9.048206e-03","x:  48.94474898<br />y: 8.904444e-03","x:  49.12786496<br />y: 8.762711e-03","x:  49.31098095<br />y: 8.622892e-03","x:  49.49409693<br />y: 8.485055e-03","x:  49.67721291<br />y: 8.349564e-03","x:  49.86032890<br />y: 8.216849e-03","x:  50.04344488<br />y: 8.086390e-03","x:  50.22656087<br />y: 7.958244e-03","x:  50.40967685<br />y: 7.832462e-03","x:  50.59279283<br />y: 7.710054e-03","x:  50.77590882<br />y: 7.590241e-03","x:  50.95902480<br />y: 7.472976e-03","x:  51.14214078<br />y: 7.358289e-03","x:  51.32525677<br />y: 7.246765e-03","x:  51.50837275<br />y: 7.138426e-03","x:  51.69148873<br />y: 7.032745e-03","x:  51.87460472<br />y: 6.929729e-03","x:  52.05772070<br />y: 6.829486e-03","x:  52.24083669<br />y: 6.732900e-03","x:  52.42395267<br />y: 6.638952e-03","x:  52.60706865<br />y: 6.547626e-03","x:  52.79018464<br />y: 6.458899e-03","x:  52.97330062<br />y: 6.373463e-03","x:  53.15641660<br />y: 6.290864e-03","x:  53.33953259<br />y: 6.210730e-03","x:  53.52264857<br />y: 6.133022e-03","x:  53.70576456<br />y: 6.057960e-03","x:  53.88888054<br />y: 5.985891e-03","x:  54.07199652<br />y: 5.916051e-03","x:  54.25511251<br />y: 5.848387e-03","x:  54.43822849<br />y: 5.782851e-03","x:  54.62134447<br />y: 5.720087e-03","x:  54.80446046<br />y: 5.659387e-03","x:  54.98757644<br />y: 5.600577e-03","x:  55.17069242<br />y: 5.543605e-03","x:  55.35380841<br />y: 5.488726e-03","x:  55.53692439<br />y: 5.435898e-03","x:  55.72004038<br />y: 5.384664e-03","x:  55.90315636<br />y: 5.334969e-03","x:  56.08627234<br />y: 5.286780e-03","x:  56.26938833<br />y: 5.240534e-03","x:  56.45250431<br />y: 5.195585e-03","x:  56.63562029<br />y: 5.151877e-03","x:  56.81873628<br />y: 5.109357e-03","x:  57.00185226<br />y: 5.068231e-03","x:  57.18496824<br />y: 5.028272e-03","x:  57.36808423<br />y: 4.989253e-03","x:  57.55120021<br />y: 4.951116e-03","x:  57.73431620<br />y: 4.913867e-03","x:  57.91743218<br />y: 4.877564e-03","x:  58.10054816<br />y: 4.841882e-03","x:  58.28366415<br />y: 4.806758e-03","x:  58.46678013<br />y: 4.772132e-03","x:  58.64989611<br />y: 4.738036e-03","x:  58.83301210<br />y: 4.704252e-03","x:  59.01612808<br />y: 4.670683e-03","x:  59.19924407<br />y: 4.637264e-03","x:  59.38236005<br />y: 4.603922e-03","x:  59.56547603<br />y: 4.570525e-03","x:  59.74859202<br />y: 4.536991e-03","x:  59.93170800<br />y: 4.503257e-03","x:  60.11482398<br />y: 4.469261e-03","x:  60.29793997<br />y: 4.434750e-03","x:  60.48105595<br />y: 4.399771e-03","x:  60.66417193<br />y: 4.364274e-03","x:  60.84728792<br />y: 4.328205e-03","x:  61.03040390<br />y: 4.291345e-03","x:  61.21351989<br />y: 4.253642e-03","x:  61.39663587<br />y: 4.215176e-03","x:  61.57975185<br />y: 4.175913e-03","x:  61.76286784<br />y: 4.135764e-03","x:  61.94598382<br />y: 4.094443e-03","x:  62.12909980<br />y: 4.052230e-03","x:  62.31221579<br />y: 4.009120e-03","x:  62.49533177<br />y: 3.965107e-03","x:  62.67844776<br />y: 3.919920e-03","x:  62.86156374<br />y: 3.873767e-03","x:  63.04467972<br />y: 3.826767e-03","x:  63.22779571<br />y: 3.778946e-03","x:  63.41091169<br />y: 3.730234e-03","x:  63.59402767<br />y: 3.680612e-03","x:  63.77714366<br />y: 3.630347e-03","x:  63.96025964<br />y: 3.579492e-03","x:  64.14337562<br />y: 3.528104e-03","x:  64.32649161<br />y: 3.476118e-03","x:  64.50960759<br />y: 3.423803e-03","x:  64.69272358<br />y: 3.371242e-03","x:  64.87583956<br />y: 3.318506e-03","x:  65.05895554<br />y: 3.265676e-03","x:  65.24207153<br />y: 3.212900e-03","x:  65.42518751<br />y: 3.160263e-03","x:  65.60830349<br />y: 3.107832e-03","x:  65.79141948<br />y: 3.055691e-03","x:  65.97453546<br />y: 3.004075e-03","x:  66.15765144<br />y: 2.952930e-03","x:  66.34076743<br />y: 2.902304e-03","x:  66.52388341<br />y: 2.852238e-03","x:  66.70699940<br />y: 2.802964e-03","x:  66.89011538<br />y: 2.754432e-03","x:  67.07323136<br />y: 2.706574e-03","x:  67.25634735<br />y: 2.659397e-03","x:  67.43946333<br />y: 2.612982e-03","x:  67.62257931<br />y: 2.567429e-03","x:  67.80569530<br />y: 2.522507e-03","x:  67.98881128<br />y: 2.478182e-03","x:  68.17192727<br />y: 2.434421e-03","x:  68.35504325<br />y: 2.391331e-03","x:  68.53815923<br />y: 2.348666e-03","x:  68.72127522<br />y: 2.306341e-03","x:  68.90439120<br />y: 2.264293e-03","x:  69.08750718<br />y: 2.222476e-03","x:  69.27062317<br />y: 2.180757e-03","x:  69.45373915<br />y: 2.139026e-03","x:  69.63685513<br />y: 2.097216e-03","x:  69.81997112<br />y: 2.055258e-03","x:  70.00308710<br />y: 2.012951e-03","x:  70.18620309<br />y: 1.970303e-03","x:  70.36931907<br />y: 1.927267e-03","x:  70.55243505<br />y: 1.883798e-03","x:  70.73555104<br />y: 1.839715e-03","x:  70.91866702<br />y: 1.795020e-03","x:  71.10178300<br />y: 1.749776e-03","x:  71.28489899<br />y: 1.703976e-03","x:  71.46801497<br />y: 1.657565e-03","x:  71.65113096<br />y: 1.610440e-03","x:  71.83424694<br />y: 1.562809e-03","x:  72.01736292<br />y: 1.514708e-03","x:  72.20047891<br />y: 1.466171e-03","x:  72.38359489<br />y: 1.417148e-03","x:  72.56671087<br />y: 1.367836e-03","x:  72.74982686<br />y: 1.318328e-03","x:  72.93294284<br />y: 1.268691e-03","x:  73.11605882<br />y: 1.219007e-03","x:  73.29917481<br />y: 1.169436e-03","x:  73.48229079<br />y: 1.120066e-03","x:  73.66540678<br />y: 1.070977e-03","x:  73.84852276<br />y: 1.022249e-03","x:  74.03163874<br />y: 9.742203e-04","x:  74.21475473<br />y: 9.268238e-04","x:  74.39787071<br />y: 8.801308e-04","x:  74.58098669<br />y: 8.342143e-04","x:  74.76410268<br />y: 7.893816e-04","x:  74.94721866<br />y: 7.457038e-04","x:  75.13033464<br />y: 7.030825e-04","x:  75.31345063<br />y: 6.615703e-04","x:  75.49656661<br />y: 6.213025e-04","x:  75.67968260<br />y: 5.826965e-04","x:  75.86279858<br />y: 5.453783e-04","x:  76.04591456<br />y: 5.093737e-04","x:  76.22903055<br />y: 4.747066e-04","x:  76.41214653<br />y: 4.418296e-04","x:  76.59526251<br />y: 4.104715e-04","x:  76.77837850<br />y: 3.804940e-04","x:  76.96149448<br />y: 3.518957e-04","x:  77.14461047<br />y: 3.248657e-04","x:  77.32772645<br />y: 2.995566e-04","x:  77.51084243<br />y: 2.755751e-04","x:  77.69395842<br />y: 2.529002e-04","x:  77.87707440<br />y: 2.315096e-04","x:  78.06019038<br />y: 2.118391e-04","x:  78.24330637<br />y: 1.933912e-04","x:  78.42642235<br />y: 1.760983e-04","x:  78.60953833<br />y: 1.599269e-04","x:  78.79265432<br />y: 1.450614e-04","x:  78.97577030<br />y: 1.314083e-04","x:  79.15888629<br />y: 1.187168e-04","x:  79.34200227<br />y: 1.069493e-04","x:  79.52511825<br />y: 9.610541e-05","x:  79.70823424<br />y: 8.638280e-05","x:  79.89135022<br />y: 7.741857e-05","x:  80.07446620<br />y: 6.917635e-05","x:  80.25758219<br />y: 6.162007e-05","x:  80.44069817<br />y: 5.488066e-05","x:  80.62381416<br />y: 4.878901e-05","x:  80.80693014<br />y: 4.323411e-05","x:  80.99004612<br />y: 3.818472e-05","x:  81.17316211<br />y: 3.366013e-05","x:  81.35627809<br />y: 2.968003e-05","x:  81.53939407<br />y: 2.608015e-05","x:  81.72251006<br />y: 2.283549e-05","x:  81.90562604<br />y: 1.992158e-05","x:  82.08874202<br />y: 1.740848e-05","x:  82.27185801<br />y: 1.516729e-05","x:  82.45497399<br />y: 1.316417e-05","x:  82.63808998<br />y: 1.138095e-05","x:  82.82120596<br />y: 9.832934e-06","x:  83.00432194<br />y: 8.493948e-06","x:  83.18743793<br />y: 7.307100e-06","x:  83.37055391<br />y: 6.259710e-06","x:  83.55366989<br />y: 5.341932e-06","x:  83.73678588<br />y: 4.575169e-06","x:  83.91990186<br />y: 3.901032e-06","x:  84.10301784<br />y: 3.311207e-06","x:  84.28613383<br />y: 2.797700e-06"],"type":"scatter","mode":"lines","line":{"width":5.66929133858268,"color":"rgba(87,109,141,1)","dash":"solid"},"hoveron":"points","name":"Died","legendgroup":"Died","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-10.7140226888332,-10.5147114454327,-10.3154002020322,-10.1160889586317,-9.91677771523113,-9.71746647183061,-9.51815522843009,-9.31884398502957,-9.11953274162905,-8.92022149822852,-8.720910254828,-8.52159901142748,-8.32228776802696,-8.12297652462644,-7.92366528122592,-7.7243540378254,-7.52504279442487,-7.32573155102435,-7.12642030762383,-6.92710906422331,-6.72779782082279,-6.52848657742227,-6.32917533402175,-6.12986409062122,-5.9305528472207,-5.73124160382018,-5.53193036041966,-5.33261911701914,-5.13330787361862,-4.9339966302181,-4.73468538681758,-4.53537414341705,-4.33606290001653,-4.13675165661601,-3.93744041321549,-3.73812916981497,-3.53881792641445,-3.33950668301393,-3.1401954396134,-2.94088419621288,-2.74157295281236,-2.54226170941184,-2.34295046601132,-2.1436392226108,-1.94432797921028,-1.74501673580975,-1.54570549240923,-1.34639424900871,-1.14708300560819,-0.947771762207669,-0.748460518807148,-0.549149275406627,-0.349838032006105,-0.150526788605584,0.0487844547949372,0.248095698195458,0.447406941595981,0.646718184996502,0.846029428397022,1.04534067179755,1.24465191519807,1.44396315859859,1.64327440199911,1.84258564539963,2.04189688880015,2.24120813220067,2.44051937560119,2.63983061900172,2.83914186240224,3.03845310580276,3.23776434920328,3.4370755926038,3.63638683600432,3.83569807940484,4.03500932280537,4.23432056620589,4.43363180960641,4.63294305300693,4.83225429640745,5.03156553980797,5.23087678320849,5.43018802660901,5.62949927000954,5.82881051341006,6.02812175681058,6.2274330002111,6.42674424361162,6.62605548701214,6.82536673041266,7.02467797381319,7.22398921721371,7.42330046061423,7.62261170401475,7.82192294741527,8.02123419081579,8.22054543421631,8.41985667761684,8.61916792101736,8.81847916441788,9.0177904078184,9.21710165121892,9.41641289461944,9.61572413801996,9.81503538142048,10.014346624821,10.2136578682215,10.412969111622,10.6122803550226,10.8115915984231,11.0109028418236,11.2102140852241,11.4095253286247,11.6088365720252,11.8081478154257,12.0074590588262,12.2067703022267,12.4060815456273,12.6053927890278,12.8047040324283,13.0040152758288,13.2033265192293,13.4026377626299,13.6019490060304,13.8012602494309,14.0005714928314,14.199882736232,14.3991939796325,14.598505223033,14.7978164664335,14.997127709834,15.1964389532346,15.3957501966351,15.5950614400356,15.7943726834361,15.9936839268366,16.1929951702372,16.3923064136377,16.5916176570382,16.7909289004387,16.9902401438393,17.1895513872398,17.3888626306403,17.5881738740408,17.7874851174413,17.9867963608419,18.1861076042424,18.3854188476429,18.5847300910434,18.7840413344439,18.9833525778445,19.182663821245,19.3819750646455,19.581286308046,19.7805975514466,19.9799087948471,20.1792200382476,20.3785312816481,20.5778425250486,20.7771537684492,20.9764650118497,21.1757762552502,21.3750874986507,21.5743987420512,21.7737099854518,21.9730212288523,22.1723324722528,22.3716437156533,22.5709549590539,22.7702662024544,22.9695774458549,23.1688886892554,23.3681999326559,23.5675111760565,23.766822419457,23.9661336628575,24.165444906258,24.3647561496585,24.5640673930591,24.7633786364596,24.9626898798601,25.1620011232606,25.3613123666611,25.5606236100617,25.7599348534622,25.9592460968627,26.1585573402632,26.3578685836638,26.5571798270643,26.7564910704648,26.9558023138653,27.1551135572658,27.3544248006664,27.5537360440669,27.7530472874674,27.9523585308679,28.1516697742684,28.350981017669,28.5502922610695,28.74960350447,28.9489147478705,29.1482259912711,29.3475372346716,29.5468484780721,29.7461597214726,29.9454709648731,30.1447822082737,30.3440934516742,30.5434046950747,30.7427159384752,30.9420271818757,31.1413384252763,31.3406496686768,31.5399609120773,31.7392721554778,31.9385833988784,32.1378946422789,32.3372058856794,32.5365171290799,32.7358283724804,32.935139615881,33.1344508592815,33.333762102682,33.5330733460825,33.732384589483,33.9316958328836,34.1310070762841,34.3303183196846,34.5296295630851,34.7289408064857,34.9282520498862,35.1275632932867,35.3268745366872,35.5261857800877,35.7254970234883,35.9248082668888,36.1241195102893,36.3234307536898,36.5227419970903,36.7220532404909,36.9213644838914,37.1206757272919,37.3199869706924,37.519298214093,37.7186094574935,37.917920700894,38.1172319442945,38.316543187695,38.5158544310956,38.7151656744961,38.9144769178966,39.1137881612971,39.3130994046976,39.5124106480982,39.7117218914987,39.9110331348992,40.1103443782997,40.3096556217003,40.5089668651008,40.7082781085013,40.9075893519018,41.1069005953023,41.3062118387029,41.5055230821034,41.7048343255039,41.9041455689044,42.1034568123049,42.3027680557055,42.502079299106,42.7013905425065,42.900701785907,43.1000130293075,43.2993242727081,43.4986355161086,43.6979467595091,43.8972580029096,44.0965692463102,44.2958804897107,44.4951917331112,44.6945029765117,44.8938142199122,45.0931254633128,45.2924367067133,45.4917479501138,45.6910591935143,45.8903704369148,46.0896816803154,46.2889929237159,46.4883041671164,46.6876154105169,46.8869266539175,47.086237897318,47.2855491407185,47.484860384119,47.6841716275195,47.8834828709201,48.0827941143206,48.2821053577211,48.4814166011216,48.6807278445221,48.8800390879227,49.0793503313232,49.2786615747237,49.4779728181242,49.6772840615248,49.8765953049253,50.0759065483258,50.2752177917263,50.4745290351268,50.6738402785274,50.8731515219279,51.0724627653284,51.2717740087289,51.4710852521294,51.67039649553,51.8697077389305,52.069018982331,52.2683302257315,52.4676414691321,52.6669527125326,52.8662639559331,53.0655751993336,53.2648864427341,53.4641976861347,53.6635089295352,53.8628201729357,54.0621314163362,54.2614426597368,54.4607539031373,54.6600651465378,54.8593763899383,55.0586876333388,55.2579988767394,55.4573101201399,55.6566213635404,55.8559326069409,56.0552438503414,56.254555093742,56.4538663371425,56.653177580543,56.8524888239435,57.051800067344,57.2511113107446,57.4504225541451,57.6497337975456,57.8490450409461,58.0483562843467,58.2476675277472,58.4469787711477,58.6462900145482,58.8456012579487,59.0449125013493,59.2442237447498,59.4435349881503,59.6428462315508,59.8421574749513,60.0414687183519,60.2407799617524,60.4400912051529,60.6394024485534,60.8387136919539,61.0380249353545,61.237336178755,61.4366474221555,61.635958665556,61.8352699089566,62.0345811523571,62.2338923957576,62.4332036391581,62.6325148825586,62.8318261259592,63.0311373693597,63.2304486127602,63.4297598561607,63.6290710995613,63.8283823429618,64.0276935863623,64.2270048297628,64.4263160731633,64.6256273165639,64.8249385599644,65.0242498033649,65.2235610467654,65.422872290166,65.6221835335665,65.821494776967,66.0208060203675,66.220117263768,66.4194285071686,66.6187397505691,66.8180509939696,67.0173622373701,67.2166734807706,67.4159847241712,67.6152959675717,67.8146072109722,68.0139184543727,68.2132296977732,68.4125409411738,68.6118521845743,68.8111634279748,69.0104746713753,69.2097859147758,69.4090971581764,69.6084084015769,69.8077196449774,70.0070308883779,70.2063421317785,70.405653375179,70.6049646185795,70.80427586198,71.0035871053805,71.2028983487811,71.4022095921816,71.6015208355821,71.8008320789826,72.0001433223832,72.1994545657837,72.3987658091842,72.5980770525847,72.7973882959852,72.9966995393858,73.1960107827863,73.3953220261868,73.5946332695873,73.7939445129878,73.9932557563884,74.1925669997889,74.3918782431894,74.5911894865899,74.7905007299905,74.989811973391,75.1891232167915,75.388434460192,75.5877457035925,75.7870569469931,75.9863681903936,76.1856794337941,76.3849906771946,76.5843019205952,76.7836131639957,76.9829244073962,77.1822356507967,77.3815468941972,77.5808581375978,77.7801693809983,77.9794806243988,78.1787918677993,78.3781031111998,78.5774143546004,78.7767255980009,78.9760368414014,79.1753480848019,79.3746593282024,79.573970571603,79.7732818150035,79.972593058404,80.1719043018045,80.371215545205,80.5705267886056,80.7698380320061,80.9691492754066,81.1684605188071,81.3677717622077,81.5670830056082,81.7663942490087,81.9657054924092,82.1650167358097,82.3643279792103,82.5636392226108,82.7629504660113,82.9622617094118,83.1615729528123,83.3608841962129,83.5601954396134,83.7595066830139,83.9588179264144,84.158129169815,84.3574404132155,84.556751656616,84.7560629000165,84.955374143417,85.1546853868176,85.3539966302181,85.5533078736186,85.7526191170191,85.9519303604197,86.1512416038202,86.3505528472207,86.5498640906212,86.7491753340217,86.9484865774223,87.1477978208228,87.3471090642233,87.5464203076238,87.7457315510243,87.9450427944249,88.1443540378254,88.3436652812259,88.5429765246264,88.742287768027,88.9415990114275,89.140910254828,89.3402214982285,89.539532741629,89.7388439850296,89.9381552284301,90.1374664718306,90.3367777152311,90.5360889586316,90.7354002020322,90.9347114454327,91.1340226888332],"y":[3.68242649792323e-05,4.36644855277051e-05,5.15213778017923e-05,6.05131745433261e-05,7.13593560755065e-05,8.37563954374593e-05,9.78560609364254e-05,0.000113815555024647,0.000132391957357977,0.000153792547398718,0.000177882286798828,0.000204880599717188,0.0002352579205301,0.000270444475240573,0.000309630189736411,0.000353093839084268,0.000401118768885494,0.000455668822940152,0.000516348638277999,0.000582930721737507,0.000655731820389588,0.000735970072653488,0.000825395367878977,0.000922428631397109,0.00102737077097587,0.0011405181924807,0.00126543701513193,0.00139990143223413,0.0015436811526867,0.00169697561524895,0.00186179652325552,0.00203883863863365,0.0022259192575841,0.0024230569450621,0.00263031143155281,0.00285151915554812,0.00308239786983459,0.00332271290479716,0.00357220367639719,0.00383251504781527,0.00410222421740668,0.0043793165737396,0.00466324278623921,0.00495374781940287,0.00525106194966204,0.00555224123381043,0.00585647753386289,0.00616294333599319,0.00647058869642586,0.00677749192384765,0.00708257755495505,0.00738486869328414,0.00768269125685626,0.00797317846073252,0.00825649909696388,0.00853167765259831,0.00879774664750923,0.00904944070745882,0.00928835164346188,0.00951426926271026,0.00972641314579057,0.0099212062976662,0.0100965033623783,0.0102552491115492,0.0103969913173188,0.0105212913203133,0.01062031110312,0.0107011176861209,0.0107636706256065,0.0108079686560033,0.0108298671415899,0.0108308854236403,0.0108145941964421,0.0107814099591922,0.0107308848330944,0.0106595237931482,0.010573854370325,0.0104746447090491,0.0103626893645435,0.0102359235604142,0.0100981211640357,0.00995164736238123,0.00979752159192174,0.00963625081551294,0.00946906063736104,0.00929895880382629,0.00912705796597094,0.00895447314161637,0.00878336722913199,0.00861541579481336,0.00845163392605446,0.00829309366594022,0.0081423038657744,0.00800182992713781,0.00787104763625853,0.00775088735551316,0.0076422631532562,0.00755191247497495,0.00747593609217753,0.00741500002167957,0.00736979683562099,0.00734505042867288,0.00734105681260779,0.00735525940175099,0.00738808124891444,0.0074409665540364,0.00752040362973828,0.0076197295086883,0.00773906878641866,0.007878518071322,0.00804391229112749,0.00823180424588208,0.00843952346786964,0.00866686033714546,0.00891565495053611,0.00918881243707524,0.00948005486282165,0.0097888875214117,0.0101147918158902,0.0104624116788514,0.0108260522165062,0.0112039198301165,0.0115952731265291,0.0120012193963118,0.0124209643959501,0.0128506002759402,0.0132892535418791,0.0137360431060635,0.0141921285623302,0.0146533561573285,0.0151187737894017,0.0155874928249664,0.0160587710561937,0.0165308122489208,0.0170024255871635,0.0174728242550913,0.0179410754184026,0.0184048717566117,0.0188643306794734,0.0193188476057006,0.019767837118601,0.0202087185507955,0.0206415687243037,0.0210668104525404,0.0214840735345097,0.0218920698770549,0.0222885100798366,0.0226757632382503,0.0230536515687674,0.0234220123957942,0.0237773461173083,0.024122122910643,0.0244569925081548,0.0247819213099581,0.0250952607780556,0.0253961778804564,0.0256871760847388,0.0259682883356586,0.0262395513895449,0.0264971549451266,0.0267449401638161,0.0269830969735821,0.0272116814971793,0.0274286783943401,0.0276344910674099,0.0278309924658956,0.0280182449295031,0.0281959159702878,0.0283611820610613,0.0285174933097735,0.0286649245700739,0.0288035524573242,0.028931082530344,0.0290489399618406,0.0291583807641159,0.029259504283191,0.029351603394048,0.0294332047393532,0.0295069724554456,0.029573026216108,0.029631486907678,0.02968006702899,0.0297209130241378,0.0297547114198659,0.0297815844167024,0.0298006124051656,0.0298113973365079,0.0298157572497417,0.0298137918530988,0.0298055978485948,0.0297889276163826,0.0297661829551929,0.029737535980605,0.0297030403608475,0.0296615075355093,0.0296131114771028,0.0295589947603676,0.0294991624509215,0.0294333935694664,0.0293597458772827,0.0292803165612339,0.0291950692620397,0.029103964681988,0.0290053168642047,0.0288998187188351,0.0287882292948224,0.0286704867959954,0.0285459196778057,0.0284130160225601,0.0282736766840986,0.0281278402690293,0.0279754466919103,0.0278142147975687,0.027645714710998,0.0274704502696143,0.0272883911270567,0.0270984621116128,0.0268999335147432,0.026694586254258,0.0264824472567322,0.0262635498036888,0.0260354007181971,0.0258005668513531,0.0255593143513267,0.0253117597644529,0.025056797023066,0.0247948208227746,0.0245272620972507,0.0242543318965285,0.0239760913168405,0.0236913556910284,0.0234023587536974,0.0231093992995391,0.0228127828800136,0.022512123803751,0.0222084823672829,0.0219026763593713,0.021595069101178,0.0212859612040944,0.0209758826292101,0.0206656574091336,0.0203556667297655,0.0200462912872456,0.019738508610698,0.0194327147127011,0.0191291647485114,0.0188282128351811,0.0185307430483417,0.0182378134571219,0.0179489312545549,0.0176643947301887,0.0173844961992933,0.017111632612319,0.0168444399910781,0.0165829988387854,0.016327528486449,0.0160795894342175,0.0158395506343327,0.0156062739719801,0.015379898615567,0.015160763140679,0.01495160519446,0.0147497908186318,0.0145553710295102,0.0143683881141937,0.0141908360355859,0.0140218383210298,0.013860236703086,0.0137059702621649,0.0135595755856798,0.0134225379525778,0.0132923315208144,0.013168777649046,0.0130516865261361,0.0129426777862182,0.0128398680675241,0.0127424002525409,0.0126499642522217,0.0125628141011486,0.0124807492871701,0.0124021288164421,0.0123265457235921,0.0122535861285728,0.012183264794911,0.0121141420378855,0.0120457022496289,0.0119774948945616,0.0119088418864329,0.0118388304925417,0.0117671183782189,0.0116932946770749,0.0116168802157911,0.0115360753115774,0.011451550562449,0.0113630122716509,0.0112701811407791,0.0111715085696173,0.0110671075349699,0.0109575699431417,0.0108427935986741,0.0107222593043327,0.0105945975323005,0.0104616400057522,0.0103234744387908,0.0101802048820057,0.010030520825193,0.00987585963538989,0.0097169373307565,0.00955401232357631,0.00938692246372755,0.00921584619169331,0.00904212857388012,0.00886611774544453,0.00868816663876551,0.0085083650481582,0.00832780941569576,0.00814691431567068,0.007966038978909,0.00778575012161022,0.00760675565400089,0.00742926014414245,0.0072535649949506,0.00708001218421965,0.00691001583104212,0.00674296390740647,0.00657905911918188,0.00641849398537979,0.00626241443840893,0.00611074309703049,0.00596300271070705,0.00581927275705565,0.0056799373434123,0.00554612873790164,0.0054164609750615,0.00529091003556175,0.00516944351793924,0.00505322016393033,0.00494125337822458,0.00483303424647043,0.0047284524236704,0.00462782571180559,0.00453136068192957,0.00443792960794719,0.00434737283432335,0.00425952755970845,0.00417501210548845,0.00409272456284539,0.00401237932298655,0.00393379699869057,0.003857030742909,0.00378175810271624,0.00370747163441325,0.00363400346101323,0.00356119307513988,0.00348891883048191,0.00341678602823663,0.00334466350196843,0.00327242470013049,0.00319983604808551,0.00312672709049796,0.00305306888960582,0.0029787929017618,0.0029037827751884,0.0028277627307382,0.00275095855721623,0.00267336900156451,0.00259499896466464,0.00251565273518228,0.00243555685396762,0.00235485344306536,0.00227361025770524,0.0021918632213882,0.00210974336495747,0.00202748816305465,0.0019452108460168,0.00186302766747953,0.00178124553827461,0.001700002436347,0.00161941651422966,0.00153962004174758,0.00146096626235141,0.001383764033568,0.00130791899157133,0.00123355114539986,0.00116079401037587,0.00109053506425306,0.00102222134110839,0.000955938156669097,0.000891766805344558,0.000830346886659543,0.000771626916416349,0.000715273544805483,0.000661321506182708,0.00060996377971565,0.000561913384968873,0.000516323499737799,0.000473184371785154,0.000432482702151032,0.00039490684465795,0.00035993942940081,0.000327270990631172,0.000296856739473925,0.000268909217614374,0.000243671015052429,0.000220449501487256,0.000199184149797628,0.00017981371906758,0.000162879837968557,0.000147723923203704,0.000134187957457845,0.000122210588623494,0.000111980578842376,0.000103450333520784,9.62246897025547e-05,9.0250811013637e-05,8.54810893519509e-05,8.22840275717692e-05,8.01278141163358e-05,7.89705020701983e-05,7.87710162404714e-05,7.96896398000062e-05,8.15948166205336e-05,8.42961217166535e-05,8.77598295092013e-05,9.19937454283344e-05,9.71335617693645e-05,0.000102893070523468,0.000109239857720751,0.000116141295715425,0.00012369642900688,0.000131748758857796,0.000140203000769468,0.00014902167273779,0.000158196232293094,0.000167692774798056,0.000177374086369674,0.000187195579351585,0.00019711205742675,0.000207055605348399,0.000216933379648192,0.00022669479837137,0.000236290405669399,0.000245615176933595,0.000254551842866121,0.000263106946137914,0.000271233693280534,0.000278885883881325,0.000285764935419283,0.000292027534725926,0.000297639027229661,0.000302565681666764,0.000306595884690585,0.000309720987978452,0.000312054490479365,0.000313582487999496,0.000314246707535289,0.000313792725881939,0.000312518113415233,0.000310431936607826,0.000307545305079441,0.000303657296160501,0.000298942967661533,0.000293525801860586,0.000287436909367022,0.000280644683920886,0.000273116412840343,0.00026508346835444,0.000256589379466296,0.000247678351098123,0.000238303275464118,0.000228645933394845,0.000218774383280001,0.000208734423259366,0.000198565547202022,0.000188351522676251,0.000178158684944692,0.000168025714696354,0.000157990357665902,0.000148173380868926,0.00013856452946509,0.000129188925869135,0.000120071352203727,0.000111307916530694,0.000102920824838364,9.48692275721158e-05,8.71639246273368e-05,7.98331985665669e-05,7.299967325213e-05,6.65347490810219e-05,6.04374575352552e-05,5.4705963844048e-05,4.94370960136042e-05,4.4561144750556e-05,4.00240734155209e-05,3.58167386253226e-05,3.19619437383028e-05,2.84969433597634e-05,2.53130899382068e-05,2.23980740705373e-05,1.97394708935575e-05,1.73984337365509e-05,1.52872462899799e-05,1.33774531857865e-05,1.16569408526036e-05,1.01393950809311e-05,8.81478948521399e-06,7.63006269864343e-06,6.57514888505496e-06,5.64020859864588e-06,4.85195241335308e-06,4.15543062287082e-06,3.54205153625046e-06],"text":["x: -10.71402269<br />y: 3.682426e-05","x: -10.51471145<br />y: 4.366449e-05","x: -10.31540020<br />y: 5.152138e-05","x: -10.11608896<br />y: 6.051317e-05","x:  -9.91677772<br />y: 7.135936e-05","x:  -9.71746647<br />y: 8.375640e-05","x:  -9.51815523<br />y: 9.785606e-05","x:  -9.31884399<br />y: 1.138156e-04","x:  -9.11953274<br />y: 1.323920e-04","x:  -8.92022150<br />y: 1.537925e-04","x:  -8.72091025<br />y: 1.778823e-04","x:  -8.52159901<br />y: 2.048806e-04","x:  -8.32228777<br />y: 2.352579e-04","x:  -8.12297652<br />y: 2.704445e-04","x:  -7.92366528<br />y: 3.096302e-04","x:  -7.72435404<br />y: 3.530938e-04","x:  -7.52504279<br />y: 4.011188e-04","x:  -7.32573155<br />y: 4.556688e-04","x:  -7.12642031<br />y: 5.163486e-04","x:  -6.92710906<br />y: 5.829307e-04","x:  -6.72779782<br />y: 6.557318e-04","x:  -6.52848658<br />y: 7.359701e-04","x:  -6.32917533<br />y: 8.253954e-04","x:  -6.12986409<br />y: 9.224286e-04","x:  -5.93055285<br />y: 1.027371e-03","x:  -5.73124160<br />y: 1.140518e-03","x:  -5.53193036<br />y: 1.265437e-03","x:  -5.33261912<br />y: 1.399901e-03","x:  -5.13330787<br />y: 1.543681e-03","x:  -4.93399663<br />y: 1.696976e-03","x:  -4.73468539<br />y: 1.861797e-03","x:  -4.53537414<br />y: 2.038839e-03","x:  -4.33606290<br />y: 2.225919e-03","x:  -4.13675166<br />y: 2.423057e-03","x:  -3.93744041<br />y: 2.630311e-03","x:  -3.73812917<br />y: 2.851519e-03","x:  -3.53881793<br />y: 3.082398e-03","x:  -3.33950668<br />y: 3.322713e-03","x:  -3.14019544<br />y: 3.572204e-03","x:  -2.94088420<br />y: 3.832515e-03","x:  -2.74157295<br />y: 4.102224e-03","x:  -2.54226171<br />y: 4.379317e-03","x:  -2.34295047<br />y: 4.663243e-03","x:  -2.14363922<br />y: 4.953748e-03","x:  -1.94432798<br />y: 5.251062e-03","x:  -1.74501674<br />y: 5.552241e-03","x:  -1.54570549<br />y: 5.856478e-03","x:  -1.34639425<br />y: 6.162943e-03","x:  -1.14708301<br />y: 6.470589e-03","x:  -0.94777176<br />y: 6.777492e-03","x:  -0.74846052<br />y: 7.082578e-03","x:  -0.54914928<br />y: 7.384869e-03","x:  -0.34983803<br />y: 7.682691e-03","x:  -0.15052679<br />y: 7.973178e-03","x:   0.04878445<br />y: 8.256499e-03","x:   0.24809570<br />y: 8.531678e-03","x:   0.44740694<br />y: 8.797747e-03","x:   0.64671818<br />y: 9.049441e-03","x:   0.84602943<br />y: 9.288352e-03","x:   1.04534067<br />y: 9.514269e-03","x:   1.24465192<br />y: 9.726413e-03","x:   1.44396316<br />y: 9.921206e-03","x:   1.64327440<br />y: 1.009650e-02","x:   1.84258565<br />y: 1.025525e-02","x:   2.04189689<br />y: 1.039699e-02","x:   2.24120813<br />y: 1.052129e-02","x:   2.44051938<br />y: 1.062031e-02","x:   2.63983062<br />y: 1.070112e-02","x:   2.83914186<br />y: 1.076367e-02","x:   3.03845311<br />y: 1.080797e-02","x:   3.23776435<br />y: 1.082987e-02","x:   3.43707559<br />y: 1.083089e-02","x:   3.63638684<br />y: 1.081459e-02","x:   3.83569808<br />y: 1.078141e-02","x:   4.03500932<br />y: 1.073088e-02","x:   4.23432057<br />y: 1.065952e-02","x:   4.43363181<br />y: 1.057385e-02","x:   4.63294305<br />y: 1.047464e-02","x:   4.83225430<br />y: 1.036269e-02","x:   5.03156554<br />y: 1.023592e-02","x:   5.23087678<br />y: 1.009812e-02","x:   5.43018803<br />y: 9.951647e-03","x:   5.62949927<br />y: 9.797522e-03","x:   5.82881051<br />y: 9.636251e-03","x:   6.02812176<br />y: 9.469061e-03","x:   6.22743300<br />y: 9.298959e-03","x:   6.42674424<br />y: 9.127058e-03","x:   6.62605549<br />y: 8.954473e-03","x:   6.82536673<br />y: 8.783367e-03","x:   7.02467797<br />y: 8.615416e-03","x:   7.22398922<br />y: 8.451634e-03","x:   7.42330046<br />y: 8.293094e-03","x:   7.62261170<br />y: 8.142304e-03","x:   7.82192295<br />y: 8.001830e-03","x:   8.02123419<br />y: 7.871048e-03","x:   8.22054543<br />y: 7.750887e-03","x:   8.41985668<br />y: 7.642263e-03","x:   8.61916792<br />y: 7.551912e-03","x:   8.81847916<br />y: 7.475936e-03","x:   9.01779041<br />y: 7.415000e-03","x:   9.21710165<br />y: 7.369797e-03","x:   9.41641289<br />y: 7.345050e-03","x:   9.61572414<br />y: 7.341057e-03","x:   9.81503538<br />y: 7.355259e-03","x:  10.01434662<br />y: 7.388081e-03","x:  10.21365787<br />y: 7.440967e-03","x:  10.41296911<br />y: 7.520404e-03","x:  10.61228036<br />y: 7.619730e-03","x:  10.81159160<br />y: 7.739069e-03","x:  11.01090284<br />y: 7.878518e-03","x:  11.21021409<br />y: 8.043912e-03","x:  11.40952533<br />y: 8.231804e-03","x:  11.60883657<br />y: 8.439523e-03","x:  11.80814782<br />y: 8.666860e-03","x:  12.00745906<br />y: 8.915655e-03","x:  12.20677030<br />y: 9.188812e-03","x:  12.40608155<br />y: 9.480055e-03","x:  12.60539279<br />y: 9.788888e-03","x:  12.80470403<br />y: 1.011479e-02","x:  13.00401528<br />y: 1.046241e-02","x:  13.20332652<br />y: 1.082605e-02","x:  13.40263776<br />y: 1.120392e-02","x:  13.60194901<br />y: 1.159527e-02","x:  13.80126025<br />y: 1.200122e-02","x:  14.00057149<br />y: 1.242096e-02","x:  14.19988274<br />y: 1.285060e-02","x:  14.39919398<br />y: 1.328925e-02","x:  14.59850522<br />y: 1.373604e-02","x:  14.79781647<br />y: 1.419213e-02","x:  14.99712771<br />y: 1.465336e-02","x:  15.19643895<br />y: 1.511877e-02","x:  15.39575020<br />y: 1.558749e-02","x:  15.59506144<br />y: 1.605877e-02","x:  15.79437268<br />y: 1.653081e-02","x:  15.99368393<br />y: 1.700243e-02","x:  16.19299517<br />y: 1.747282e-02","x:  16.39230641<br />y: 1.794108e-02","x:  16.59161766<br />y: 1.840487e-02","x:  16.79092890<br />y: 1.886433e-02","x:  16.99024014<br />y: 1.931885e-02","x:  17.18955139<br />y: 1.976784e-02","x:  17.38886263<br />y: 2.020872e-02","x:  17.58817387<br />y: 2.064157e-02","x:  17.78748512<br />y: 2.106681e-02","x:  17.98679636<br />y: 2.148407e-02","x:  18.18610760<br />y: 2.189207e-02","x:  18.38541885<br />y: 2.228851e-02","x:  18.58473009<br />y: 2.267576e-02","x:  18.78404133<br />y: 2.305365e-02","x:  18.98335258<br />y: 2.342201e-02","x:  19.18266382<br />y: 2.377735e-02","x:  19.38197506<br />y: 2.412212e-02","x:  19.58128631<br />y: 2.445699e-02","x:  19.78059755<br />y: 2.478192e-02","x:  19.97990879<br />y: 2.509526e-02","x:  20.17922004<br />y: 2.539618e-02","x:  20.37853128<br />y: 2.568718e-02","x:  20.57784253<br />y: 2.596829e-02","x:  20.77715377<br />y: 2.623955e-02","x:  20.97646501<br />y: 2.649715e-02","x:  21.17577626<br />y: 2.674494e-02","x:  21.37508750<br />y: 2.698310e-02","x:  21.57439874<br />y: 2.721168e-02","x:  21.77370999<br />y: 2.742868e-02","x:  21.97302123<br />y: 2.763449e-02","x:  22.17233247<br />y: 2.783099e-02","x:  22.37164372<br />y: 2.801824e-02","x:  22.57095496<br />y: 2.819592e-02","x:  22.77026620<br />y: 2.836118e-02","x:  22.96957745<br />y: 2.851749e-02","x:  23.16888869<br />y: 2.866492e-02","x:  23.36819993<br />y: 2.880355e-02","x:  23.56751118<br />y: 2.893108e-02","x:  23.76682242<br />y: 2.904894e-02","x:  23.96613366<br />y: 2.915838e-02","x:  24.16544491<br />y: 2.925950e-02","x:  24.36475615<br />y: 2.935160e-02","x:  24.56406739<br />y: 2.943320e-02","x:  24.76337864<br />y: 2.950697e-02","x:  24.96268988<br />y: 2.957303e-02","x:  25.16200112<br />y: 2.963149e-02","x:  25.36131237<br />y: 2.968007e-02","x:  25.56062361<br />y: 2.972091e-02","x:  25.75993485<br />y: 2.975471e-02","x:  25.95924610<br />y: 2.978158e-02","x:  26.15855734<br />y: 2.980061e-02","x:  26.35786858<br />y: 2.981140e-02","x:  26.55717983<br />y: 2.981576e-02","x:  26.75649107<br />y: 2.981379e-02","x:  26.95580231<br />y: 2.980560e-02","x:  27.15511356<br />y: 2.978893e-02","x:  27.35442480<br />y: 2.976618e-02","x:  27.55373604<br />y: 2.973754e-02","x:  27.75304729<br />y: 2.970304e-02","x:  27.95235853<br />y: 2.966151e-02","x:  28.15166977<br />y: 2.961311e-02","x:  28.35098102<br />y: 2.955899e-02","x:  28.55029226<br />y: 2.949916e-02","x:  28.74960350<br />y: 2.943339e-02","x:  28.94891475<br />y: 2.935975e-02","x:  29.14822599<br />y: 2.928032e-02","x:  29.34753723<br />y: 2.919507e-02","x:  29.54684848<br />y: 2.910396e-02","x:  29.74615972<br />y: 2.900532e-02","x:  29.94547096<br />y: 2.889982e-02","x:  30.14478221<br />y: 2.878823e-02","x:  30.34409345<br />y: 2.867049e-02","x:  30.54340470<br />y: 2.854592e-02","x:  30.74271594<br />y: 2.841302e-02","x:  30.94202718<br />y: 2.827368e-02","x:  31.14133843<br />y: 2.812784e-02","x:  31.34064967<br />y: 2.797545e-02","x:  31.53996091<br />y: 2.781421e-02","x:  31.73927216<br />y: 2.764571e-02","x:  31.93858340<br />y: 2.747045e-02","x:  32.13789464<br />y: 2.728839e-02","x:  32.33720589<br />y: 2.709846e-02","x:  32.53651713<br />y: 2.689993e-02","x:  32.73582837<br />y: 2.669459e-02","x:  32.93513962<br />y: 2.648245e-02","x:  33.13445086<br />y: 2.626355e-02","x:  33.33376210<br />y: 2.603540e-02","x:  33.53307335<br />y: 2.580057e-02","x:  33.73238459<br />y: 2.555931e-02","x:  33.93169583<br />y: 2.531176e-02","x:  34.13100708<br />y: 2.505680e-02","x:  34.33031832<br />y: 2.479482e-02","x:  34.52962956<br />y: 2.452726e-02","x:  34.72894081<br />y: 2.425433e-02","x:  34.92825205<br />y: 2.397609e-02","x:  35.12756329<br />y: 2.369136e-02","x:  35.32687454<br />y: 2.340236e-02","x:  35.52618578<br />y: 2.310940e-02","x:  35.72549702<br />y: 2.281278e-02","x:  35.92480827<br />y: 2.251212e-02","x:  36.12411951<br />y: 2.220848e-02","x:  36.32343075<br />y: 2.190268e-02","x:  36.52274200<br />y: 2.159507e-02","x:  36.72205324<br />y: 2.128596e-02","x:  36.92136448<br />y: 2.097588e-02","x:  37.12067573<br />y: 2.066566e-02","x:  37.31998697<br />y: 2.035567e-02","x:  37.51929821<br />y: 2.004629e-02","x:  37.71860946<br />y: 1.973851e-02","x:  37.91792070<br />y: 1.943271e-02","x:  38.11723194<br />y: 1.912916e-02","x:  38.31654319<br />y: 1.882821e-02","x:  38.51585443<br />y: 1.853074e-02","x:  38.71516567<br />y: 1.823781e-02","x:  38.91447692<br />y: 1.794893e-02","x:  39.11378816<br />y: 1.766439e-02","x:  39.31309940<br />y: 1.738450e-02","x:  39.51241065<br />y: 1.711163e-02","x:  39.71172189<br />y: 1.684444e-02","x:  39.91103313<br />y: 1.658300e-02","x:  40.11034438<br />y: 1.632753e-02","x:  40.30965562<br />y: 1.607959e-02","x:  40.50896687<br />y: 1.583955e-02","x:  40.70827811<br />y: 1.560627e-02","x:  40.90758935<br />y: 1.537990e-02","x:  41.10690060<br />y: 1.516076e-02","x:  41.30621184<br />y: 1.495161e-02","x:  41.50552308<br />y: 1.474979e-02","x:  41.70483433<br />y: 1.455537e-02","x:  41.90414557<br />y: 1.436839e-02","x:  42.10345681<br />y: 1.419084e-02","x:  42.30276806<br />y: 1.402184e-02","x:  42.50207930<br />y: 1.386024e-02","x:  42.70139054<br />y: 1.370597e-02","x:  42.90070179<br />y: 1.355958e-02","x:  43.10001303<br />y: 1.342254e-02","x:  43.29932427<br />y: 1.329233e-02","x:  43.49863552<br />y: 1.316878e-02","x:  43.69794676<br />y: 1.305169e-02","x:  43.89725800<br />y: 1.294268e-02","x:  44.09656925<br />y: 1.283987e-02","x:  44.29588049<br />y: 1.274240e-02","x:  44.49519173<br />y: 1.264996e-02","x:  44.69450298<br />y: 1.256281e-02","x:  44.89381422<br />y: 1.248075e-02","x:  45.09312546<br />y: 1.240213e-02","x:  45.29243671<br />y: 1.232655e-02","x:  45.49174795<br />y: 1.225359e-02","x:  45.69105919<br />y: 1.218326e-02","x:  45.89037044<br />y: 1.211414e-02","x:  46.08968168<br />y: 1.204570e-02","x:  46.28899292<br />y: 1.197749e-02","x:  46.48830417<br />y: 1.190884e-02","x:  46.68761541<br />y: 1.183883e-02","x:  46.88692665<br />y: 1.176712e-02","x:  47.08623790<br />y: 1.169329e-02","x:  47.28554914<br />y: 1.161688e-02","x:  47.48486038<br />y: 1.153608e-02","x:  47.68417163<br />y: 1.145155e-02","x:  47.88348287<br />y: 1.136301e-02","x:  48.08279411<br />y: 1.127018e-02","x:  48.28210536<br />y: 1.117151e-02","x:  48.48141660<br />y: 1.106711e-02","x:  48.68072784<br />y: 1.095757e-02","x:  48.88003909<br />y: 1.084279e-02","x:  49.07935033<br />y: 1.072226e-02","x:  49.27866157<br />y: 1.059460e-02","x:  49.47797282<br />y: 1.046164e-02","x:  49.67728406<br />y: 1.032347e-02","x:  49.87659530<br />y: 1.018020e-02","x:  50.07590655<br />y: 1.003052e-02","x:  50.27521779<br />y: 9.875860e-03","x:  50.47452904<br />y: 9.716937e-03","x:  50.67384028<br />y: 9.554012e-03","x:  50.87315152<br />y: 9.386922e-03","x:  51.07246277<br />y: 9.215846e-03","x:  51.27177401<br />y: 9.042129e-03","x:  51.47108525<br />y: 8.866118e-03","x:  51.67039650<br />y: 8.688167e-03","x:  51.86970774<br />y: 8.508365e-03","x:  52.06901898<br />y: 8.327809e-03","x:  52.26833023<br />y: 8.146914e-03","x:  52.46764147<br />y: 7.966039e-03","x:  52.66695271<br />y: 7.785750e-03","x:  52.86626396<br />y: 7.606756e-03","x:  53.06557520<br />y: 7.429260e-03","x:  53.26488644<br />y: 7.253565e-03","x:  53.46419769<br />y: 7.080012e-03","x:  53.66350893<br />y: 6.910016e-03","x:  53.86282017<br />y: 6.742964e-03","x:  54.06213142<br />y: 6.579059e-03","x:  54.26144266<br />y: 6.418494e-03","x:  54.46075390<br />y: 6.262414e-03","x:  54.66006515<br />y: 6.110743e-03","x:  54.85937639<br />y: 5.963003e-03","x:  55.05868763<br />y: 5.819273e-03","x:  55.25799888<br />y: 5.679937e-03","x:  55.45731012<br />y: 5.546129e-03","x:  55.65662136<br />y: 5.416461e-03","x:  55.85593261<br />y: 5.290910e-03","x:  56.05524385<br />y: 5.169444e-03","x:  56.25455509<br />y: 5.053220e-03","x:  56.45386634<br />y: 4.941253e-03","x:  56.65317758<br />y: 4.833034e-03","x:  56.85248882<br />y: 4.728452e-03","x:  57.05180007<br />y: 4.627826e-03","x:  57.25111131<br />y: 4.531361e-03","x:  57.45042255<br />y: 4.437930e-03","x:  57.64973380<br />y: 4.347373e-03","x:  57.84904504<br />y: 4.259528e-03","x:  58.04835628<br />y: 4.175012e-03","x:  58.24766753<br />y: 4.092725e-03","x:  58.44697877<br />y: 4.012379e-03","x:  58.64629001<br />y: 3.933797e-03","x:  58.84560126<br />y: 3.857031e-03","x:  59.04491250<br />y: 3.781758e-03","x:  59.24422374<br />y: 3.707472e-03","x:  59.44353499<br />y: 3.634003e-03","x:  59.64284623<br />y: 3.561193e-03","x:  59.84215747<br />y: 3.488919e-03","x:  60.04146872<br />y: 3.416786e-03","x:  60.24077996<br />y: 3.344664e-03","x:  60.44009121<br />y: 3.272425e-03","x:  60.63940245<br />y: 3.199836e-03","x:  60.83871369<br />y: 3.126727e-03","x:  61.03802494<br />y: 3.053069e-03","x:  61.23733618<br />y: 2.978793e-03","x:  61.43664742<br />y: 2.903783e-03","x:  61.63595867<br />y: 2.827763e-03","x:  61.83526991<br />y: 2.750959e-03","x:  62.03458115<br />y: 2.673369e-03","x:  62.23389240<br />y: 2.594999e-03","x:  62.43320364<br />y: 2.515653e-03","x:  62.63251488<br />y: 2.435557e-03","x:  62.83182613<br />y: 2.354853e-03","x:  63.03113737<br />y: 2.273610e-03","x:  63.23044861<br />y: 2.191863e-03","x:  63.42975986<br />y: 2.109743e-03","x:  63.62907110<br />y: 2.027488e-03","x:  63.82838234<br />y: 1.945211e-03","x:  64.02769359<br />y: 1.863028e-03","x:  64.22700483<br />y: 1.781246e-03","x:  64.42631607<br />y: 1.700002e-03","x:  64.62562732<br />y: 1.619417e-03","x:  64.82493856<br />y: 1.539620e-03","x:  65.02424980<br />y: 1.460966e-03","x:  65.22356105<br />y: 1.383764e-03","x:  65.42287229<br />y: 1.307919e-03","x:  65.62218353<br />y: 1.233551e-03","x:  65.82149478<br />y: 1.160794e-03","x:  66.02080602<br />y: 1.090535e-03","x:  66.22011726<br />y: 1.022221e-03","x:  66.41942851<br />y: 9.559382e-04","x:  66.61873975<br />y: 8.917668e-04","x:  66.81805099<br />y: 8.303469e-04","x:  67.01736224<br />y: 7.716269e-04","x:  67.21667348<br />y: 7.152735e-04","x:  67.41598472<br />y: 6.613215e-04","x:  67.61529597<br />y: 6.099638e-04","x:  67.81460721<br />y: 5.619134e-04","x:  68.01391845<br />y: 5.163235e-04","x:  68.21322970<br />y: 4.731844e-04","x:  68.41254094<br />y: 4.324827e-04","x:  68.61185218<br />y: 3.949068e-04","x:  68.81116343<br />y: 3.599394e-04","x:  69.01047467<br />y: 3.272710e-04","x:  69.20978591<br />y: 2.968567e-04","x:  69.40909716<br />y: 2.689092e-04","x:  69.60840840<br />y: 2.436710e-04","x:  69.80771964<br />y: 2.204495e-04","x:  70.00703089<br />y: 1.991841e-04","x:  70.20634213<br />y: 1.798137e-04","x:  70.40565338<br />y: 1.628798e-04","x:  70.60496462<br />y: 1.477239e-04","x:  70.80427586<br />y: 1.341880e-04","x:  71.00358711<br />y: 1.222106e-04","x:  71.20289835<br />y: 1.119806e-04","x:  71.40220959<br />y: 1.034503e-04","x:  71.60152084<br />y: 9.622469e-05","x:  71.80083208<br />y: 9.025081e-05","x:  72.00014332<br />y: 8.548109e-05","x:  72.19945457<br />y: 8.228403e-05","x:  72.39876581<br />y: 8.012781e-05","x:  72.59807705<br />y: 7.897050e-05","x:  72.79738830<br />y: 7.877102e-05","x:  72.99669954<br />y: 7.968964e-05","x:  73.19601078<br />y: 8.159482e-05","x:  73.39532203<br />y: 8.429612e-05","x:  73.59463327<br />y: 8.775983e-05","x:  73.79394451<br />y: 9.199375e-05","x:  73.99325576<br />y: 9.713356e-05","x:  74.19256700<br />y: 1.028931e-04","x:  74.39187824<br />y: 1.092399e-04","x:  74.59118949<br />y: 1.161413e-04","x:  74.79050073<br />y: 1.236964e-04","x:  74.98981197<br />y: 1.317488e-04","x:  75.18912322<br />y: 1.402030e-04","x:  75.38843446<br />y: 1.490217e-04","x:  75.58774570<br />y: 1.581962e-04","x:  75.78705695<br />y: 1.676928e-04","x:  75.98636819<br />y: 1.773741e-04","x:  76.18567943<br />y: 1.871956e-04","x:  76.38499068<br />y: 1.971121e-04","x:  76.58430192<br />y: 2.070556e-04","x:  76.78361316<br />y: 2.169334e-04","x:  76.98292441<br />y: 2.266948e-04","x:  77.18223565<br />y: 2.362904e-04","x:  77.38154689<br />y: 2.456152e-04","x:  77.58085814<br />y: 2.545518e-04","x:  77.78016938<br />y: 2.631069e-04","x:  77.97948062<br />y: 2.712337e-04","x:  78.17879187<br />y: 2.788859e-04","x:  78.37810311<br />y: 2.857649e-04","x:  78.57741435<br />y: 2.920275e-04","x:  78.77672560<br />y: 2.976390e-04","x:  78.97603684<br />y: 3.025657e-04","x:  79.17534808<br />y: 3.065959e-04","x:  79.37465933<br />y: 3.097210e-04","x:  79.57397057<br />y: 3.120545e-04","x:  79.77328182<br />y: 3.135825e-04","x:  79.97259306<br />y: 3.142467e-04","x:  80.17190430<br />y: 3.137927e-04","x:  80.37121555<br />y: 3.125181e-04","x:  80.57052679<br />y: 3.104319e-04","x:  80.76983803<br />y: 3.075453e-04","x:  80.96914928<br />y: 3.036573e-04","x:  81.16846052<br />y: 2.989430e-04","x:  81.36777176<br />y: 2.935258e-04","x:  81.56708301<br />y: 2.874369e-04","x:  81.76639425<br />y: 2.806447e-04","x:  81.96570549<br />y: 2.731164e-04","x:  82.16501674<br />y: 2.650835e-04","x:  82.36432798<br />y: 2.565894e-04","x:  82.56363922<br />y: 2.476784e-04","x:  82.76295047<br />y: 2.383033e-04","x:  82.96226171<br />y: 2.286459e-04","x:  83.16157295<br />y: 2.187744e-04","x:  83.36088420<br />y: 2.087344e-04","x:  83.56019544<br />y: 1.985655e-04","x:  83.75950668<br />y: 1.883515e-04","x:  83.95881793<br />y: 1.781587e-04","x:  84.15812917<br />y: 1.680257e-04","x:  84.35744041<br />y: 1.579904e-04","x:  84.55675166<br />y: 1.481734e-04","x:  84.75606290<br />y: 1.385645e-04","x:  84.95537414<br />y: 1.291889e-04","x:  85.15468539<br />y: 1.200714e-04","x:  85.35399663<br />y: 1.113079e-04","x:  85.55330787<br />y: 1.029208e-04","x:  85.75261912<br />y: 9.486923e-05","x:  85.95193036<br />y: 8.716392e-05","x:  86.15124160<br />y: 7.983320e-05","x:  86.35055285<br />y: 7.299967e-05","x:  86.54986409<br />y: 6.653475e-05","x:  86.74917533<br />y: 6.043746e-05","x:  86.94848658<br />y: 5.470596e-05","x:  87.14779782<br />y: 4.943710e-05","x:  87.34710906<br />y: 4.456114e-05","x:  87.54642031<br />y: 4.002407e-05","x:  87.74573155<br />y: 3.581674e-05","x:  87.94504279<br />y: 3.196194e-05","x:  88.14435404<br />y: 2.849694e-05","x:  88.34366528<br />y: 2.531309e-05","x:  88.54297652<br />y: 2.239807e-05","x:  88.74228777<br />y: 1.973947e-05","x:  88.94159901<br />y: 1.739843e-05","x:  89.14091025<br />y: 1.528725e-05","x:  89.34022150<br />y: 1.337745e-05","x:  89.53953274<br />y: 1.165694e-05","x:  89.73884399<br />y: 1.013940e-05","x:  89.93815523<br />y: 8.814789e-06","x:  90.13746647<br />y: 7.630063e-06","x:  90.33677772<br />y: 6.575149e-06","x:  90.53608896<br />y: 5.640209e-06","x:  90.73540020<br />y: 4.851952e-06","x:  90.93471145<br />y: 4.155431e-06","x:  91.13402269<br />y: 3.542052e-06"],"type":"scatter","mode":"lines","line":{"width":5.66929133858268,"color":"rgba(196,150,26,1)","dash":"solid"},"hoveron":"points","name":"Survived","legendgroup":"Survived","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":47.4819427148194,"r":7.30593607305936,"b":48.4184308841843,"l":61.4362806143628},"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"title":{"text":"<b> Density Estimates of 'Age' <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":21.2536322125363},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-15.8064249577165,96.2264249577165],"tickmode":"array","ticktext":["0","25","50","75"],"tickvals":[-1.77635683940025e-15,25,50,75],"categoryorder":"array","categoryarray":["0","25","50","75"],"nticks":null,"ticks":"outside","tickcolor":"rgba(0,0,0,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Age","font":{"color":"rgba(0,0,0,1)","family":"","size":18.5969281859693}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.00196193492239473,0.0412006333702892],"tickmode":"array","ticktext":["0.00","0.01","0.02","0.03","0.04"],"tickvals":[0,0.01,0.02,0.03,0.04],"categoryorder":"array","categoryarray":["0.00","0.01","0.02","0.03","0.04"],"nticks":null,"ticks":"outside","tickcolor":"rgba(0,0,0,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"Density","font":{"color":"rgba(0,0,0,1)","family":"","size":18.5969281859693}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"group","font":{"color":null,"family":null,"size":0}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2ee05c772ae6":{"x":{},"y":{},"colour":{},"type":"scatter"}},"cur_data":"2ee05c772ae6","visdat":{"2ee05c772ae6":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>From the preceding graph, it is evident that passengers below the age of 9 had a higher likelihood of survival, whereas individuals around the age of 20 had a greater likelihood of not surviving.</p>
+<p>The analysis of age distribution unveils the contrasting proportions of passengers who survived and those who did not. Illustrated in the subsequent graph, children, especially those aged 0 to 5, displayed a remarkably high survival rate. Conversely, in the higher age bracket, particularly between 50 and 70, the mortality rate is notably elevated, save for a remarkable exception – an 80-year-old passenger who survived.</p>
+<div class="cell">
+<details><summary>Code</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">Titanic_2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Age</span>, fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">Survived</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"Survived"</span>, caption <span class="op">=</span> <span class="st">"Survived = 1; Not Survived = 0"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+<p><img src="titanic_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>In the upcoming graph, we will employ a histogram to depict the survival rate based on age, class, and sex.</p>
+<div class="cell">
+<details><summary>Code</summary><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">Titanic_2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Age</span>, fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">Survived</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="va">Sex</span> <span class="op">~</span> <span class="va">Class</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"Survived"</span>, caption <span class="op">=</span> <span class="st">"Survived = 1; Not Survived = 0"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+<p><img src="titanic_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Females in the first class exhibited an exceptionally high rate of survivability as in the second class. However, females in the third class experienced notably lower survivability.</p>
+<p>Conversely, among males, the survival rate was highest in the first class, followed by the second class. The survival rate for males in the third class was markedly low.</p>
+</section><section id="a-linear-probability-model-for-survival" class="level2"><h2 class="anchored" data-anchor-id="a-linear-probability-model-for-survival">A Linear Probability Model for Survival</h2>
+<p>How do socio-economic characteristics of the passagers impact the probability of survival? In particular, are there systematic differences between the three passagers classes? Do the data reflect the “children and women first” policy?</p>
+<p>We are going to start the analysis by estimating a simple linear probability model like (LMP)</p>
+<p><span class="math display">\[Survived_i = \beta_0 + \beta_1Class2_i + \beta_2Class3_i + \mu_i\]</span></p>
+<p>Where <span class="math inline">\(Class2\)</span> and <span class="math inline">\(Class3\)</span> are dummy variables</p>
+<div class="cell">
+<details><summary>Code</summary><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">#  A Linear Probability Model for Survival I</span></span>
+<span></span>
+<span><span class="co">#encode "Class" as a factor</span></span>
+<span></span>
+<span><span class="va">Titanic_2</span><span class="op">$</span><span class="va">Class</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">Titanic_2</span><span class="op">$</span><span class="va">Class</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#model</span></span>
+<span><span class="va">surv_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Survived</span> <span class="op">~</span> <span class="va">Class</span>, data <span class="op">=</span><span class="va">Titanic_2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Robust summary </span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/lmtest/man/coeftest.html">coeftest</a></span><span class="op">(</span><span class="va">surv_mod</span>,<span class="va">vcovHC</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+<pre><code>
+t test of coefficients:
+
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  0.629630   0.033010  19.074  &lt; 2e-16 ***
+Class2      -0.156804   0.049590  -3.162  0.00162 ** 
+Class3      -0.385276   0.038346 -10.047  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<details><summary>Code</summary><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># predict the probability of survival for all passenger classes</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">surv_mod</span>, newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="st">"Class"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+<pre><code>        1         2         3 
+0.6296296 0.4728261 0.2443532 </code></pre>
+</div>
+</div>
+<p><span class="math display">\[ \hat{Survived_i} = 0,63 - 0,16Class2_i - 0,39Class3_i + \mu_i\]</span> Based on this model, we can infer that the notably significant coefficients indicate a decline in the probability of survival associated with the passenger class. Specifically, passengers from a less affluent class are less likely to survive. Breaking it down further, the survival probabilities are 62.96% for first class, 47.28% for second class, and 24.43% for third class passengers.</p>
+<p>However, it’s crucial to acknowledge that this result may be influenced by omitted variable bias, stemming from the correlation of passenger class with determinants of survival probability not considered in the model. To address this potential bias, we augment the model to incorporate all remaining variables as additional regressors.</p>
+<div class="cell">
+<details><summary>Code</summary><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">surv_prob_c1</span> <span class="op">&lt;-</span> <span class="va">surv_mod</span><span class="op">$</span><span class="va">coefficients</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>  </span>
+<span><span class="va">surv_prob_c2</span> <span class="op">&lt;-</span> <span class="va">surv_prob_c1</span> <span class="op">+</span> <span class="va">surv_mod</span><span class="op">$</span><span class="va">coefficients</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>  </span>
+<span><span class="va">surv_prob_c3</span> <span class="op">&lt;-</span> <span class="va">surv_prob_c1</span> <span class="op">+</span> <span class="va">surv_mod</span><span class="op">$</span><span class="va">coefficients</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>  </span>
+<span></span>
+<span><span class="va">LPM_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Survived</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">Titanic_2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/lmtest/man/coeftest.html">coeftest</a></span><span class="op">(</span><span class="va">LPM_mod</span>, <span class="va">vcovHC</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+<pre><code>
+t test of coefficients:
+
+               Estimate  Std. Error  t value  Pr(&gt;|t|)    
+(Intercept)  1.14897720  0.05771825  19.9067 &lt; 2.2e-16 ***
+Class2      -0.17454604  0.04483443  -3.8931 0.0001065 ***
+Class3      -0.35824271  0.04540211  -7.8904 8.929e-15 ***
+Sexmale     -0.50753080  0.03014992 -16.8336 &lt; 2.2e-16 ***
+Age         -0.00618427  0.00108174  -5.7170 1.485e-08 ***
+Siblings    -0.05024630  0.01213239  -4.1415 3.783e-05 ***
+Parents     -0.01942544  0.01947431  -0.9975 0.3188009    
+Fare         0.00041656  0.00033039   1.2608 0.2077018    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Following this analysis, it becomes apparent that certain variables, namely sexmale, age, and siblings, are found to be statistically significant. These variables were omitted in the previous model but are now recognized as having a meaningful impact on the outcomes.</p>
+</section><section id="logit" class="level2"><h2 class="anchored" data-anchor-id="logit">Logit</h2>
+<p>Logistic regression, also known as Logit regression, is a more appropriate method than Linear Probability Model (LPM) for modeling the conditional probability function of a dichotomous outcome variable. Unlike the LPM, logistic regression employs a nonlinear link function that constrains the fitted values to fall within the range of 0 to 1. Specifically, in logistic regression, the log-odds of the outcome are modeled as a linear combination of predictors, while the LPM assumes linearity in the conditional probability function of the outcome.</p>
+<p><span class="math display">\[ \begin{multlined}
+log \biggl(\frac{P (Survived_i=1)}{1-P(Survived_i=1)}\biggr) = \beta_0 + \beta_1Class2_i + \beta_2Class3_i + \beta_3 Sex_i + \\ \beta_4 Age_i  + \beta_5 Siblings_i + \beta_6 Parents_i +\beta_7 Fare_i + \mu_i
+\end{multlined}\]</span></p>
+<div class="cell">
+<details><summary>Code</summary><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">Logit_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">Survived</span> <span class="op">~</span> <span class="va">.</span>, </span>
+<span>                 family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"logit"</span><span class="op">)</span>, </span>
+<span>                 data <span class="op">=</span> <span class="va">Titanic_2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># obtain a robust summary of the model coefficients</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/lmtest/man/coeftest.html">coeftest</a></span><span class="op">(</span><span class="va">Logit_mod</span>, <span class="va">vcovHC</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+<pre><code>
+z test of coefficients:
+
+              Estimate Std. Error  z value  Pr(&gt;|z|)    
+(Intercept)  4.1097773  0.4618578   8.8984 &lt; 2.2e-16 ***
+Class2      -1.1614906  0.2760107  -4.2081 2.575e-05 ***
+Class3      -2.3500224  0.3098841  -7.5836 3.362e-14 ***
+Sexmale     -2.7567103  0.1971364 -13.9838 &lt; 2.2e-16 ***
+Age         -0.0434102  0.0082767  -5.2449 1.564e-07 ***
+Siblings    -0.4015716  0.1041230  -3.8567 0.0001149 ***
+Parents     -0.1068835  0.1142875  -0.9352 0.3496766    
+Fare         0.0028229  0.0022390   1.2608 0.2073908    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<details><summary>Code</summary><div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">#new_data &lt;- data.frame(Class = Logit_mod$model$Class)</span></span>
+<span></span>
+<span><span class="co"># predict the probability of survival for the hypothecial individuals</span></span>
+<span><span class="co">#predict(Logit_mod, newdata = new_data, type = "response")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We note that all variables exert a consistent negative influence on the probability of survival, mirroring the patterns observed in the linear model. The variables that demonstrated significance in the linear model maintain their significance in this context, while those that were not significant in the linear model also lack significance here.</p>
+<section id="marginal-effect" class="level3"><h3 class="anchored" data-anchor-id="marginal-effect">Marginal Effect</h3>
+<p>Marginal effects denote the change in probability when the predictor or independent variable increases by one unit. For continuous variables, this signifies the instantaneous change, acknowledging that the ‘unit’ may be very small. In the case of binary variables, the change is from 0 to 1, constituting one ‘unit’ as conventionally understood.</p>
+<div class="cell">
+<details><summary>Code</summary><div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">mfx</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/mfx/man/logitmfx.html">logitmfx</a></span><span class="op">(</span><span class="va">Survived</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">Titanic_2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+<pre><code>Call:
+logitmfx(formula = Survived ~ ., data = Titanic_2)
+
+Marginal Effects:
+               dF/dx   Std. Err.        z     P&gt;|z|    
+Class2   -0.22774170  0.04931429  -4.6182 3.871e-06 ***
+Class3   -0.50234866  0.05477782  -9.1707 &lt; 2.2e-16 ***
+Sexmale  -0.59195078  0.03332933 -17.7607 &lt; 2.2e-16 ***
+Age      -0.00980575  0.00175413  -5.5901 2.269e-08 ***
+Siblings -0.09070936  0.02496026  -3.6342 0.0002789 ***
+Parents  -0.02414348  0.02686565  -0.8987 0.3688259    
+Fare      0.00063765  0.00055967   1.1393 0.2545643    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+dF/dx is for discrete change for the following variables:
+
+[1] "Class2"  "Class3"  "Sexmale"</code></pre>
+</div>
+</div>
+</section></section><section id="probit" class="level2"><h2 class="anchored" data-anchor-id="probit">Probit</h2>
+<p><span class="math display">\[
+\begin{multlined}
+P(Survived = 1 | Class2_i, Class3_i,...,Fare_i) = \Phi (\beta_0 + \beta_1Class2_i + \\ \beta_2Class3_i + \beta_3 Sex_i + \beta_4 Age_i + \beta_5 Siblings_i + \beta_6 Parents_i +\beta_7 Fare_i + \mu_i)
+\end{multlined}
+\]</span></p>
+<div class="cell">
+<details><summary>Code</summary><div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">## PROBIT </span></span>
+<span></span>
+<span></span>
+<span><span class="co"># fit the Probit model, assign it to `Probit_mod`</span></span>
+<span><span class="va">Probit_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">Survived</span> <span class="op">~</span> <span class="va">.</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"probit"</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">Titanic_2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># obtain a robust summary of the model coefficients</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/lmtest/man/coeftest.html">coeftest</a></span><span class="op">(</span><span class="va">Probit_mod</span>, <span class="va">vcovHC</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+<pre><code>
+z test of coefficients:
+
+              Estimate Std. Error  z value  Pr(&gt;|z|)    
+(Intercept)  2.3646470  0.2614851   9.0431 &lt; 2.2e-16 ***
+Class2      -0.6629013  0.1601625  -4.1389 3.489e-05 ***
+Class3      -1.3186829  0.1758669  -7.4982 6.471e-14 ***
+Sexmale     -1.6250032  0.1093154 -14.8653 &lt; 2.2e-16 ***
+Age         -0.0245111  0.0047938  -5.1131 3.169e-07 ***
+Siblings    -0.2306630  0.0574980  -4.0117 6.029e-05 ***
+Parents     -0.0750691  0.0669832  -1.1207    0.2624    
+Fare         0.0018100  0.0012832   1.4106    0.1584    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<details><summary>Code</summary><div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># predict the probability of survival for the hypothecial individuals</span></span>
+<span><span class="co">#predict(Probit_mod, newdata = data.frame("Sexmale" = as.factor(1:2)))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The findings here align closely with those observed in the logistic regression model.</p>
+<section id="conclusions" class="level3"><h3 class="anchored" data-anchor-id="conclusions">Conclusions</h3>
+<p>In summary, our exploration of the Titanic dataset reveals a poignant story of societal dynamics during a tragic event. Passenger class emerges as a key determinant, impacting survival odds significantly. The age-old ethos of “women and children first” echoes in the data, with children aged 0 to 5 symbolizing resilience.</p>
+<p>Gender plays a crucial role, showcasing higher survival rates among women. As we delve into statistical models, variables like sex, age, and familial ties consistently influence survival chances. The correlation between passenger class and survival, the nuanced impact of age, and gender-specific dynamics enrich our understanding of the Titanic tragedy.</p>
+</section></section>
+</div>
+<!-- -->
+
+</section></main><!-- /main column --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb22" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Analyzing Titanic Passenger Data to Understand Survival Patterns"</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> |</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co">   Universidad Carlos III de Madrid Econometrics 1</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> Luis Pérez (luispepa@uv.es)  #--</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> 2023-01-12                 #--</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [Econometrics I, UC3M ]   #--</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co">#image: "./imagenes/uc3m.png"</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="an">title-block-banner:</span><span class="co"> "#022E4B"</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="an">title-block-banner-color:</span><span class="co"> "#FFFFFF"    #-"#FFFFFF" </span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="an">toc:</span><span class="co"> true</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="an">toc-location:</span><span class="co"> left</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="an">toc-depth:</span><span class="co"> 3</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="an">smooth-scroll:</span><span class="co"> true</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> </span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a><span class="co">    maintfont: serif</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a><span class="co">    backgroundcolor: "#F1F3F4"</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a><span class="co">    standalone: true  </span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a><span class="co">    link-external-newwindow: true</span></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a><span class="co">    #css: ./assets/my_css_file.css   #- CUIDADO!!!!</span></span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a><span class="an">code-tools:</span><span class="co"> true</span></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a><span class="an">code-link:</span><span class="co"> true</span></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a><span class="an">code-fold:</span><span class="co"> true</span></span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span><span class="co"> </span></span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a><span class="co">  warning: false</span></span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a><span class="an">text:</span><span class="co"> \usepackage{mathtools}</span></span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a><span class="in">```{css, echo = FALSE}</span></span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a><span class="op">.</span><span class="fu">justify</span> <span class="op">{</span></span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>  text<span class="op">-</span>align<span class="op">:</span> justify <span class="op">!</span>important</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a><span class="fu">## Introduction</span></span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>::: {.justify}</span>
+<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>The sinking of the Titanic stands as a pivotal event in history, prompting extensive scholarly investigation into the factors influencing passenger survival. This project utilizes the titanic.csv dataset, accessible at https://stanford.io/2O9RUCF, to scrutinize socioeconomic variables and identify patterns contributing to survival, treating it as a binary outcome.</span>
+<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a>Our objectives include data exploration and visualization, analyzing age density distributions conditioned on survival to ascertain its predictive value. Subsequently, we employ modeling techniques such as the linear probability model, logistic regression, and probit regression to explore nuanced relationships between survival and socioeconomic factors.</span>
+<span id="cb22-43"><a href="#cb22-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-44"><a href="#cb22-44" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data</span></span>
+<span id="cb22-47"><a href="#cb22-47" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-48"><a href="#cb22-48" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb22-49"><a href="#cb22-49" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb22-50"><a href="#cb22-50" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span>
+<span id="cb22-51"><a href="#cb22-51" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb22-52"><a href="#cb22-52" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggthemes)</span>
+<span id="cb22-53"><a href="#cb22-53" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggThemeAssist)</span>
+<span id="cb22-54"><a href="#cb22-54" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span>
+<span id="cb22-55"><a href="#cb22-55" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(AER)</span>
+<span id="cb22-56"><a href="#cb22-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-57"><a href="#cb22-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-58"><a href="#cb22-58" aria-hidden="true" tabindex="-1"></a>Titanic_2 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://stanford.io/2O9RUCF"</span>)</span>
+<span id="cb22-59"><a href="#cb22-59" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(Titanic_2)</span>
+<span id="cb22-60"><a href="#cb22-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-61"><a href="#cb22-61" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-62"><a href="#cb22-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-63"><a href="#cb22-63" aria-hidden="true" tabindex="-1"></a>In the dataset, we observe information for 887 passengers distributed across 8 columns. Notably, the "Survived" column contains binary data, taking the value of 1 if the individual survived and 0 otherwise. The "PClass" column indicates the class in which the individual traveled, with three distinct classes available. The "Name" column is deemed irrelevant for our analysis. Additionally, key demographic details include the passenger's gender ("Sex"), age ("Age"), the presence of siblings aboard ("Siblings"), the count of parents aboard ("Parents"), and the cost of the ticket in British pounds ("Fare").</span>
+<span id="cb22-64"><a href="#cb22-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-65"><a href="#cb22-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-66"><a href="#cb22-66" aria-hidden="true" tabindex="-1"></a>The bar chart illustrates the relative proportions of survivors and casualties based on gender. Among females, a higher proportion survived, while among males, a greater number experienced fatalities.</span>
+<span id="cb22-67"><a href="#cb22-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-70"><a href="#cb22-70" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-71"><a href="#cb22-71" aria-hidden="true" tabindex="-1"></a>Titanic_2 <span class="ot">&lt;-</span> Titanic_2[, <span class="sc">-</span><span class="dv">3</span>]</span>
+<span id="cb22-72"><a href="#cb22-72" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(Titanic_2) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Survived"</span>, <span class="st">"Class"</span>, <span class="st">"Sex"</span>, <span class="st">"Age"</span>, <span class="st">"Siblings"</span>, <span class="st">"Parents"</span>, <span class="st">"Fare"</span>)</span>
+<span id="cb22-73"><a href="#cb22-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-74"><a href="#cb22-74" aria-hidden="true" tabindex="-1"></a>t_abs <span class="ot">&lt;-</span><span class="fu">table</span>(Titanic_2<span class="sc">$</span>Survived, Titanic_2<span class="sc">$</span>Class)</span>
+<span id="cb22-75"><a href="#cb22-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-76"><a href="#cb22-76" aria-hidden="true" tabindex="-1"></a><span class="co"># CORRELATION BETWEEN</span></span>
+<span id="cb22-77"><a href="#cb22-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-78"><a href="#cb22-78" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(<span class="fu">cor</span>(<span class="fu">select_if</span>(Titanic_2, is.numeric)))</span>
+<span id="cb22-79"><a href="#cb22-79" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-80"><a href="#cb22-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-81"><a href="#cb22-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-82"><a href="#cb22-82" aria-hidden="true" tabindex="-1"></a>As evident from the preceding plot, it is notable that the most pronounced correlation exists between the fare and passenger class. This correlation suggests a discernible pattern that can be anticipated or forecasted.</span>
+<span id="cb22-83"><a href="#cb22-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-84"><a href="#cb22-84" aria-hidden="true" tabindex="-1"></a>We can employ density estimates to examine the distribution of age conditional on survival and the distribution of class on survival. This analysis aims to discern potential indications of how age and class are associated with the likelihood of survival. Notably, despite the dataset reporting ages as integers, we treat age as a continuous variable in this context. An intriguing aspect to explore is whether there are observable patterns that shed light on the effectiveness of the 'women and children first' policy in influencing survival outcomes.</span>
+<span id="cb22-85"><a href="#cb22-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-88"><a href="#cb22-88" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-89"><a href="#cb22-89" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb22-90"><a href="#cb22-90" aria-hidden="true" tabindex="-1"></a><span class="co"># generate `t_rel`, the table of the relative frequencies</span></span>
+<span id="cb22-91"><a href="#cb22-91" aria-hidden="true" tabindex="-1"></a>t_rel <span class="ot">&lt;-</span> t_abs<span class="sc">/</span><span class="fu">nrow</span>(Titanic_2)</span>
+<span id="cb22-92"><a href="#cb22-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-93"><a href="#cb22-93" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">table</span>(Titanic_2<span class="sc">$</span>Survived, Titanic_2<span class="sc">$</span>Class)<span class="sc">/</span><span class="fu">nrow</span>(Titanic_2))</span>
+<span id="cb22-94"><a href="#cb22-94" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(data) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Survived"</span>, <span class="st">"Class"</span>, <span class="st">"Frequency"</span>)</span>
+<span id="cb22-95"><a href="#cb22-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-96"><a href="#cb22-96" aria-hidden="true" tabindex="-1"></a><span class="co"># Cambiar el orden de los factores en el eje y</span></span>
+<span id="cb22-97"><a href="#cb22-97" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>Survived <span class="ot">&lt;-</span> <span class="fu">factor</span>(data<span class="sc">$</span>Survived, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb22-98"><a href="#cb22-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-99"><a href="#cb22-99" aria-hidden="true" tabindex="-1"></a><span class="co"># relative frequencies of survival (plot)</span></span>
+<span id="cb22-100"><a href="#cb22-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-101"><a href="#cb22-101" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> Class, <span class="at">y =</span> Frequency, <span class="at">fill =</span> Survived)) <span class="sc">+</span></span>
+<span id="cb22-102"><a href="#cb22-102" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"stack"</span>, <span class="at">width =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb22-103"><a href="#cb22-103" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"darkgreen"</span>, <span class="st">"darkred"</span>)) <span class="sc">+</span></span>
+<span id="cb22-104"><a href="#cb22-104" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Relative Frequencies of Survival"</span>,</span>
+<span id="cb22-105"><a href="#cb22-105" aria-hidden="true" tabindex="-1"></a>             <span class="at">x =</span> <span class="st">"Class"</span>,</span>
+<span id="cb22-106"><a href="#cb22-106" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="st">"Relative Frequency"</span>) <span class="sc">+</span></span>
+<span id="cb22-107"><a href="#cb22-107" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb22-108"><a href="#cb22-108" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_minimal</span>()</span>
+<span id="cb22-109"><a href="#cb22-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-110"><a href="#cb22-110" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-111"><a href="#cb22-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-112"><a href="#cb22-112" aria-hidden="true" tabindex="-1"></a>Analyzing the preceding graph, it is evident that approximately 20% of the passengers belonged to the first class, another 20% to the second class, with nearly half of them unfortunately not surviving. In contrast, passengers in the third class constituted just under 60%, and regrettably, almost 80% of them did not survive, representing 40% of the total passengers.</span>
+<span id="cb22-113"><a href="#cb22-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-116"><a href="#cb22-116" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-117"><a href="#cb22-117" aria-hidden="true" tabindex="-1"></a><span class="co">#data1 &lt;- Titanic_2 %&gt;%</span></span>
+<span id="cb22-118"><a href="#cb22-118" aria-hidden="true" tabindex="-1"></a> <span class="co">#   group_by(Survived, Sex) %&gt;%</span></span>
+<span id="cb22-119"><a href="#cb22-119" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  summarize(Frequency = n()) %&gt;%</span></span>
+<span id="cb22-120"><a href="#cb22-120" aria-hidden="true" tabindex="-1"></a>   <span class="co"># group_by(Sex) %&gt;%</span></span>
+<span id="cb22-121"><a href="#cb22-121" aria-hidden="true" tabindex="-1"></a>    <span class="do">##mutate(Proportion = Frequency / sum(Frequency))</span></span>
+<span id="cb22-122"><a href="#cb22-122" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb22-123"><a href="#cb22-123" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb22-124"><a href="#cb22-124" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb22-125"><a href="#cb22-125" aria-hidden="true" tabindex="-1"></a><span class="do">## Cambiar el orden de los factores en el eje y</span></span>
+<span id="cb22-126"><a href="#cb22-126" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb22-127"><a href="#cb22-127" aria-hidden="true" tabindex="-1"></a><span class="do">## Convertir Proportion a factor</span></span>
+<span id="cb22-128"><a href="#cb22-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-129"><a href="#cb22-129" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear el gráfico de barras apiladas</span></span>
+<span id="cb22-130"><a href="#cb22-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-131"><a href="#cb22-131" aria-hidden="true" tabindex="-1"></a><span class="co">#ggplot(data1, aes(x = Sex, y = Proportion, fill = as.factor(Survived))) +</span></span>
+<span id="cb22-132"><a href="#cb22-132" aria-hidden="true" tabindex="-1"></a> <span class="co">#   geom_bar(stat = "identity", position = "stack", width = 0.7) +</span></span>
+<span id="cb22-133"><a href="#cb22-133" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  scale_fill_manual(values = c("#009AFF", "#022E4B")) +</span></span>
+<span id="cb22-134"><a href="#cb22-134" aria-hidden="true" tabindex="-1"></a>   <span class="co"># labs(title = "Frequency of Survival by Gender",</span></span>
+<span id="cb22-135"><a href="#cb22-135" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     x = "Sex",</span></span>
+<span id="cb22-136"><a href="#cb22-136" aria-hidden="true" tabindex="-1"></a>     <span class="co">#    y = "Frequency",</span></span>
+<span id="cb22-137"><a href="#cb22-137" aria-hidden="true" tabindex="-1"></a>      <span class="co">#   fill = "Survived") +</span></span>
+<span id="cb22-138"><a href="#cb22-138" aria-hidden="true" tabindex="-1"></a>    <span class="co">#theme_minimal()</span></span>
+<span id="cb22-139"><a href="#cb22-139" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostrar el gráfico</span></span>
+<span id="cb22-140"><a href="#cb22-140" aria-hidden="true" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> Titanic_2 <span class="sc">%&gt;%</span></span>
+<span id="cb22-141"><a href="#cb22-141" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(Survived, Sex) <span class="sc">%&gt;%</span></span>
+<span id="cb22-142"><a href="#cb22-142" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">Frequency =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb22-143"><a href="#cb22-143" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(Sex) <span class="sc">%&gt;%</span></span>
+<span id="cb22-144"><a href="#cb22-144" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Proportion =</span> Frequency <span class="sc">/</span> <span class="fu">sum</span>(Frequency))</span>
+<span id="cb22-145"><a href="#cb22-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-146"><a href="#cb22-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-147"><a href="#cb22-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-148"><a href="#cb22-148" aria-hidden="true" tabindex="-1"></a><span class="co"># Cambiar el orden de los factores en el eje y</span></span>
+<span id="cb22-149"><a href="#cb22-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-150"><a href="#cb22-150" aria-hidden="true" tabindex="-1"></a><span class="co"># Convertir Proportion a factor</span></span>
+<span id="cb22-151"><a href="#cb22-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-152"><a href="#cb22-152" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear el gráfico de barras apiladas</span></span>
+<span id="cb22-153"><a href="#cb22-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-154"><a href="#cb22-154" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data1, <span class="fu">aes</span>(<span class="at">x =</span> Sex, <span class="at">y =</span> Proportion, <span class="at">fill =</span> <span class="fu">as.factor</span>(Survived))) <span class="sc">+</span></span>
+<span id="cb22-155"><a href="#cb22-155" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"stack"</span>, <span class="at">width =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb22-156"><a href="#cb22-156" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#009AFF"</span>, <span class="st">"#022E4B"</span>)) <span class="sc">+</span></span>
+<span id="cb22-157"><a href="#cb22-157" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Frequency of Survival by Gender"</span>,</span>
+<span id="cb22-158"><a href="#cb22-158" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Sex"</span>,</span>
+<span id="cb22-159"><a href="#cb22-159" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Frequency"</span>,</span>
+<span id="cb22-160"><a href="#cb22-160" aria-hidden="true" tabindex="-1"></a>         <span class="at">fill =</span> <span class="st">"Survived"</span>) <span class="sc">+</span></span>
+<span id="cb22-161"><a href="#cb22-161" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span>
+<span id="cb22-162"><a href="#cb22-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-163"><a href="#cb22-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-164"><a href="#cb22-164" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-165"><a href="#cb22-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-166"><a href="#cb22-166" aria-hidden="true" tabindex="-1"></a>The bar chart illustrates the relative proportion of survival and mortality based on gender. Among females, a higher proportion survived( about 75%), while among males, a greater proportion did not survive(less than 25%).</span>
+<span id="cb22-167"><a href="#cb22-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-168"><a href="#cb22-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-169"><a href="#cb22-169" aria-hidden="true" tabindex="-1"></a>Density estimates are employed to analyze the distribution of Age conditioned on survival, aiming to discern any indications of how age may be related to the likelihood of survival.</span>
+<span id="cb22-172"><a href="#cb22-172" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-173"><a href="#cb22-173" aria-hidden="true" tabindex="-1"></a><span class="co"># DENSITY DISTRIBUTION </span></span>
+<span id="cb22-174"><a href="#cb22-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-175"><a href="#cb22-175" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate both densities</span></span>
+<span id="cb22-176"><a href="#cb22-176" aria-hidden="true" tabindex="-1"></a>dens_age_surv <span class="ot">&lt;-</span> <span class="fu">density</span>(Titanic_2<span class="sc">$</span>Age[Titanic_2<span class="sc">$</span>Survived <span class="sc">==</span> <span class="dv">1</span>])</span>
+<span id="cb22-177"><a href="#cb22-177" aria-hidden="true" tabindex="-1"></a>dens_age_died <span class="ot">&lt;-</span> <span class="fu">density</span>(Titanic_2<span class="sc">$</span>Age[Titanic_2<span class="sc">$</span>Survived <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb22-178"><a href="#cb22-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-179"><a href="#cb22-179" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine data into a single data frame for ggplot</span></span>
+<span id="cb22-180"><a href="#cb22-180" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb22-181"><a href="#cb22-181" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="fu">c</span>(dens_age_surv<span class="sc">$</span>x, dens_age_died<span class="sc">$</span>x),</span>
+<span id="cb22-182"><a href="#cb22-182" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="fu">c</span>(dens_age_surv<span class="sc">$</span>y, dens_age_died<span class="sc">$</span>y),</span>
+<span id="cb22-183"><a href="#cb22-183" aria-hidden="true" tabindex="-1"></a>        <span class="at">group =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Survived"</span>, <span class="st">"Died"</span>), <span class="at">each =</span> <span class="fu">length</span>(dens_age_surv<span class="sc">$</span>x))</span>
+<span id="cb22-184"><a href="#cb22-184" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-185"><a href="#cb22-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-186"><a href="#cb22-186" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the maximum y value for setting ylim</span></span>
+<span id="cb22-187"><a href="#cb22-187" aria-hidden="true" tabindex="-1"></a>max_y <span class="ot">&lt;-</span> <span class="fu">max</span>(data<span class="sc">$</span>y)</span>
+<span id="cb22-188"><a href="#cb22-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-189"><a href="#cb22-189" aria-hidden="true" tabindex="-1"></a><span class="co"># Create ggplot with a more appealing style</span></span>
+<span id="cb22-190"><a href="#cb22-190" aria-hidden="true" tabindex="-1"></a>g<span class="ot">&lt;-</span><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">color =</span> group)) <span class="sc">+</span></span>
+<span id="cb22-191"><a href="#cb22-191" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb22-192"><a href="#cb22-192" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ylim</span>(<span class="dv">0</span>, max_y <span class="sc">*</span> <span class="fl">1.1</span>) <span class="sc">+</span>  <span class="co"># Adjust ylim to accommodate the highest density</span></span>
+<span id="cb22-193"><a href="#cb22-193" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(</span>
+<span id="cb22-194"><a href="#cb22-194" aria-hidden="true" tabindex="-1"></a>                <span class="at">title =</span> <span class="st">"Density Estimates of 'Age'"</span>,</span>
+<span id="cb22-195"><a href="#cb22-195" aria-hidden="true" tabindex="-1"></a>                <span class="at">x =</span> <span class="st">"Age"</span>,</span>
+<span id="cb22-196"><a href="#cb22-196" aria-hidden="true" tabindex="-1"></a>                <span class="at">y =</span> <span class="st">"Density"</span>,</span>
+<span id="cb22-197"><a href="#cb22-197" aria-hidden="true" tabindex="-1"></a>                <span class="at">caption =</span> <span class="st">"Data source: Titanic_2"</span></span>
+<span id="cb22-198"><a href="#cb22-198" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
+<span id="cb22-199"><a href="#cb22-199" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Survived"</span> <span class="ot">=</span> <span class="st">"#C4961A"</span>, <span class="st">"Died"</span> <span class="ot">=</span> <span class="st">"#576d8d"</span>)) <span class="sc">+</span></span>
+<span id="cb22-200"><a href="#cb22-200" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb22-201"><a href="#cb22-201" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(</span>
+<span id="cb22-202"><a href="#cb22-202" aria-hidden="true" tabindex="-1"></a>                <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb22-203"><a href="#cb22-203" aria-hidden="true" tabindex="-1"></a>                <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>),</span>
+<span id="cb22-204"><a href="#cb22-204" aria-hidden="true" tabindex="-1"></a>                <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb22-205"><a href="#cb22-205" aria-hidden="true" tabindex="-1"></a>                <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb22-206"><a href="#cb22-206" aria-hidden="true" tabindex="-1"></a>                <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)</span>
+<span id="cb22-207"><a href="#cb22-207" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">axis.line =</span> <span class="fu">element_line</span>(<span class="at">size =</span> <span class="fl">0.5</span>,</span>
+<span id="cb22-208"><a href="#cb22-208" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"solid"</span>), <span class="at">axis.ticks =</span> <span class="fu">element_line</span>(<span class="at">linetype =</span> <span class="st">"dashed"</span>)) <span class="sc">+</span><span class="fu">labs</span>(<span class="at">caption =</span> <span class="st">"Chart crafted by the author."</span>)</span>
+<span id="cb22-209"><a href="#cb22-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-210"><a href="#cb22-210" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(g)</span>
+<span id="cb22-211"><a href="#cb22-211" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-212"><a href="#cb22-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-213"><a href="#cb22-213" aria-hidden="true" tabindex="-1"></a>From the preceding graph, it is evident that passengers below the age of 9 had a higher likelihood of survival, whereas individuals around the age of 20 had a greater likelihood of not surviving.</span>
+<span id="cb22-214"><a href="#cb22-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-215"><a href="#cb22-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-216"><a href="#cb22-216" aria-hidden="true" tabindex="-1"></a>The analysis of age distribution unveils the contrasting proportions of passengers who survived and those who did not. Illustrated in the subsequent graph, children, especially those aged 0 to 5, displayed a remarkably high survival rate. Conversely, in the higher age bracket, particularly between 50 and 70, the mortality rate is notably elevated, save for a remarkable exception – an 80-year-old passenger who survived.</span>
+<span id="cb22-217"><a href="#cb22-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-220"><a href="#cb22-220" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-221"><a href="#cb22-221" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(Titanic_2, <span class="fu">aes</span>(<span class="at">x =</span> Age, <span class="at">fill =</span> <span class="fu">as.factor</span>(Survived))) <span class="sc">+</span></span>
+<span id="cb22-222"><a href="#cb22-222" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb22-223"><a href="#cb22-223" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">+</span><span class="fu">labs</span>(<span class="at">fill =</span> <span class="st">"Survived"</span>, <span class="at">caption =</span> <span class="st">"Survived = 1; Not Survived = 0"</span>)</span>
+<span id="cb22-224"><a href="#cb22-224" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-225"><a href="#cb22-225" aria-hidden="true" tabindex="-1"></a>In the upcoming graph, we will employ a histogram to depict the survival rate based on age, class, and sex.</span>
+<span id="cb22-226"><a href="#cb22-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-229"><a href="#cb22-229" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-230"><a href="#cb22-230" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(Titanic_2, <span class="fu">aes</span>(<span class="at">x =</span> Age, <span class="at">fill =</span> <span class="fu">as.factor</span>(Survived))) <span class="sc">+</span></span>
+<span id="cb22-231"><a href="#cb22-231" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb22-232"><a href="#cb22-232" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(Sex <span class="sc">~</span> Class) <span class="sc">+</span></span>
+<span id="cb22-233"><a href="#cb22-233" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb22-234"><a href="#cb22-234" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="st">"Survived"</span>, <span class="at">caption =</span> <span class="st">"Survived = 1; Not Survived = 0"</span>)</span>
+<span id="cb22-235"><a href="#cb22-235" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-236"><a href="#cb22-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-237"><a href="#cb22-237" aria-hidden="true" tabindex="-1"></a>Females in the first class exhibited an exceptionally high rate of survivability as in the second class. However, females in the third class experienced notably lower survivability.</span>
+<span id="cb22-238"><a href="#cb22-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-239"><a href="#cb22-239" aria-hidden="true" tabindex="-1"></a>Conversely, among males, the survival rate was highest in the first class, followed by the second class. The survival rate for males in the third class was markedly low.</span>
+<span id="cb22-240"><a href="#cb22-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-241"><a href="#cb22-241" aria-hidden="true" tabindex="-1"></a><span class="fu">## A Linear Probability Model for Survival </span></span>
+<span id="cb22-242"><a href="#cb22-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-243"><a href="#cb22-243" aria-hidden="true" tabindex="-1"></a>How do socio-economic characteristics of the passagers impact the probability of survival?</span>
+<span id="cb22-244"><a href="#cb22-244" aria-hidden="true" tabindex="-1"></a>In particular, are there systematic differences between the three passagers classes? Do the data reflect the "children and women first" policy?</span>
+<span id="cb22-245"><a href="#cb22-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-246"><a href="#cb22-246" aria-hidden="true" tabindex="-1"></a>We are going to start the analysis by estimating a simple linear probability model like (LMP)</span>
+<span id="cb22-247"><a href="#cb22-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-248"><a href="#cb22-248" aria-hidden="true" tabindex="-1"></a>$$Survived_i = \beta_0 + \beta_1Class2_i + \beta_2Class3_i + \mu_i$$</span>
+<span id="cb22-249"><a href="#cb22-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-250"><a href="#cb22-250" aria-hidden="true" tabindex="-1"></a>Where $Class2$ and $Class3$ are dummy variables</span>
+<span id="cb22-251"><a href="#cb22-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-254"><a href="#cb22-254" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-255"><a href="#cb22-255" aria-hidden="true" tabindex="-1"></a><span class="co">#  A Linear Probability Model for Survival I</span></span>
+<span id="cb22-256"><a href="#cb22-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-257"><a href="#cb22-257" aria-hidden="true" tabindex="-1"></a><span class="co">#encode "Class" as a factor</span></span>
+<span id="cb22-258"><a href="#cb22-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-259"><a href="#cb22-259" aria-hidden="true" tabindex="-1"></a>Titanic_2<span class="sc">$</span>Class <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(Titanic_2<span class="sc">$</span>Class)</span>
+<span id="cb22-260"><a href="#cb22-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-261"><a href="#cb22-261" aria-hidden="true" tabindex="-1"></a><span class="co">#model</span></span>
+<span id="cb22-262"><a href="#cb22-262" aria-hidden="true" tabindex="-1"></a>surv_mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(Survived <span class="sc">~</span> Class, <span class="at">data =</span>Titanic_2)</span>
+<span id="cb22-263"><a href="#cb22-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-264"><a href="#cb22-264" aria-hidden="true" tabindex="-1"></a><span class="co"># Robust summary </span></span>
+<span id="cb22-265"><a href="#cb22-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-266"><a href="#cb22-266" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(surv_mod,vcovHC)</span>
+<span id="cb22-267"><a href="#cb22-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-268"><a href="#cb22-268" aria-hidden="true" tabindex="-1"></a><span class="co"># predict the probability of survival for all passenger classes</span></span>
+<span id="cb22-269"><a href="#cb22-269" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(surv_mod, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="st">"Class"</span> <span class="ot">=</span> <span class="fu">as.factor</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)))</span>
+<span id="cb22-270"><a href="#cb22-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-271"><a href="#cb22-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-272"><a href="#cb22-272" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-273"><a href="#cb22-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-274"><a href="#cb22-274" aria-hidden="true" tabindex="-1"></a>$$ \hat{Survived_i} = 0,63 - 0,16Class2_i - 0,39Class3_i + \mu_i$$</span>
+<span id="cb22-275"><a href="#cb22-275" aria-hidden="true" tabindex="-1"></a>Based on this model, we can infer that the notably significant coefficients indicate a decline in the probability of survival associated with the passenger class. Specifically, passengers from a less affluent class are less likely to survive. Breaking it down further, the survival probabilities are 62.96% for first class, 47.28% for second class, and 24.43% for third class passengers.</span>
+<span id="cb22-276"><a href="#cb22-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-277"><a href="#cb22-277" aria-hidden="true" tabindex="-1"></a>However, it's crucial to acknowledge that this result may be influenced by omitted variable bias, stemming from the correlation of passenger class with determinants of survival probability not considered in the model. To address this potential bias, we augment the model to incorporate all remaining variables as additional regressors.</span>
+<span id="cb22-278"><a href="#cb22-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-281"><a href="#cb22-281" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-282"><a href="#cb22-282" aria-hidden="true" tabindex="-1"></a>surv_prob_c1 <span class="ot">&lt;-</span> surv_mod<span class="sc">$</span>coefficients[<span class="dv">1</span>]  </span>
+<span id="cb22-283"><a href="#cb22-283" aria-hidden="true" tabindex="-1"></a>surv_prob_c2 <span class="ot">&lt;-</span> surv_prob_c1 <span class="sc">+</span> surv_mod<span class="sc">$</span>coefficients[<span class="dv">2</span>]  </span>
+<span id="cb22-284"><a href="#cb22-284" aria-hidden="true" tabindex="-1"></a>surv_prob_c3 <span class="ot">&lt;-</span> surv_prob_c1 <span class="sc">+</span> surv_mod<span class="sc">$</span>coefficients[<span class="dv">3</span>]  </span>
+<span id="cb22-285"><a href="#cb22-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-286"><a href="#cb22-286" aria-hidden="true" tabindex="-1"></a>LPM_mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(Survived <span class="sc">~</span> ., <span class="at">data =</span> Titanic_2)</span>
+<span id="cb22-287"><a href="#cb22-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-288"><a href="#cb22-288" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(LPM_mod, vcovHC)</span>
+<span id="cb22-289"><a href="#cb22-289" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-290"><a href="#cb22-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-291"><a href="#cb22-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-292"><a href="#cb22-292" aria-hidden="true" tabindex="-1"></a>Following this analysis, it becomes apparent that certain variables, namely sexmale, age, and siblings, are found to be statistically significant. These variables were omitted in the previous model but are now recognized as having a meaningful impact on the outcomes.</span>
+<span id="cb22-293"><a href="#cb22-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-294"><a href="#cb22-294" aria-hidden="true" tabindex="-1"></a><span class="fu">## Logit</span></span>
+<span id="cb22-295"><a href="#cb22-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-296"><a href="#cb22-296" aria-hidden="true" tabindex="-1"></a>Logistic regression, also known as Logit regression, is a more appropriate method than Linear Probability Model (LPM) for modeling the conditional probability function of a dichotomous outcome variable. Unlike the LPM, logistic regression employs a nonlinear link function that constrains the fitted values to fall within the range of 0 to 1. Specifically, in logistic regression, the log-odds of the outcome are modeled as a linear combination of predictors, while the LPM assumes linearity in the conditional probability function of the outcome.</span>
+<span id="cb22-297"><a href="#cb22-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-298"><a href="#cb22-298" aria-hidden="true" tabindex="-1"></a>$$ \begin{multlined}</span>
+<span id="cb22-299"><a href="#cb22-299" aria-hidden="true" tabindex="-1"></a>log \biggl(\frac{P (Survived_i=1)}{1-P(Survived_i=1)}\biggr) = \beta_0 + \beta_1Class2_i + \beta_2Class3_i + \beta_3 Sex_i + <span class="sc">\\</span> \beta_4 Age_i  + \beta_5 Siblings_i + \beta_6 Parents_i +\beta_7 Fare_i + \mu_i </span>
+<span id="cb22-300"><a href="#cb22-300" aria-hidden="true" tabindex="-1"></a>\end{multlined}$$</span>
+<span id="cb22-301"><a href="#cb22-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-304"><a href="#cb22-304" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-305"><a href="#cb22-305" aria-hidden="true" tabindex="-1"></a>Logit_mod <span class="ot">&lt;-</span> <span class="fu">glm</span>(Survived <span class="sc">~</span> ., </span>
+<span id="cb22-306"><a href="#cb22-306" aria-hidden="true" tabindex="-1"></a>                 <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), </span>
+<span id="cb22-307"><a href="#cb22-307" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> Titanic_2)</span>
+<span id="cb22-308"><a href="#cb22-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-309"><a href="#cb22-309" aria-hidden="true" tabindex="-1"></a><span class="co"># obtain a robust summary of the model coefficients</span></span>
+<span id="cb22-310"><a href="#cb22-310" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(Logit_mod, vcovHC)</span>
+<span id="cb22-311"><a href="#cb22-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-312"><a href="#cb22-312" aria-hidden="true" tabindex="-1"></a><span class="co">#new_data &lt;- data.frame(Class = Logit_mod$model$Class)</span></span>
+<span id="cb22-313"><a href="#cb22-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-314"><a href="#cb22-314" aria-hidden="true" tabindex="-1"></a><span class="co"># predict the probability of survival for the hypothecial individuals</span></span>
+<span id="cb22-315"><a href="#cb22-315" aria-hidden="true" tabindex="-1"></a><span class="co">#predict(Logit_mod, newdata = new_data, type = "response")</span></span>
+<span id="cb22-316"><a href="#cb22-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-317"><a href="#cb22-317" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-318"><a href="#cb22-318" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-319"><a href="#cb22-319" aria-hidden="true" tabindex="-1"></a>We note that all variables exert a consistent negative influence on the probability of survival, mirroring the patterns observed in the linear model. The variables that demonstrated significance in the linear model maintain their significance in this context, while those that were not significant in the linear model also lack significance here.</span>
+<span id="cb22-320"><a href="#cb22-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-321"><a href="#cb22-321" aria-hidden="true" tabindex="-1"></a><span class="fu">### Marginal Effect</span></span>
+<span id="cb22-322"><a href="#cb22-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-323"><a href="#cb22-323" aria-hidden="true" tabindex="-1"></a>Marginal effects denote the change in probability when the predictor or independent variable increases by one unit. For continuous variables, this signifies the instantaneous change, acknowledging that the 'unit' may be very small. In the case of binary variables, the change is from 0 to 1, constituting one 'unit' as conventionally understood.</span>
+<span id="cb22-326"><a href="#cb22-326" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-327"><a href="#cb22-327" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mfx)</span>
+<span id="cb22-328"><a href="#cb22-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-329"><a href="#cb22-329" aria-hidden="true" tabindex="-1"></a><span class="fu">logitmfx</span>(Survived <span class="sc">~</span> ., <span class="at">data =</span> Titanic_2)</span>
+<span id="cb22-330"><a href="#cb22-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-331"><a href="#cb22-331" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-332"><a href="#cb22-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-333"><a href="#cb22-333" aria-hidden="true" tabindex="-1"></a><span class="fu">## Probit</span></span>
+<span id="cb22-334"><a href="#cb22-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-335"><a href="#cb22-335" aria-hidden="true" tabindex="-1"></a>$$ </span>
+<span id="cb22-336"><a href="#cb22-336" aria-hidden="true" tabindex="-1"></a>\begin{multlined}</span>
+<span id="cb22-337"><a href="#cb22-337" aria-hidden="true" tabindex="-1"></a>P(Survived = 1 | Class2_i, Class3_i,...,Fare_i) = \Phi (\beta_0 + \beta_1Class2_i + <span class="sc">\\</span> \beta_2Class3_i + \beta_3 Sex_i + \beta_4 Age_i + \beta_5 Siblings_i + \beta_6 Parents_i +\beta_7 Fare_i + \mu_i)</span>
+<span id="cb22-338"><a href="#cb22-338" aria-hidden="true" tabindex="-1"></a>\end{multlined}</span>
+<span id="cb22-339"><a href="#cb22-339" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb22-342"><a href="#cb22-342" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-343"><a href="#cb22-343" aria-hidden="true" tabindex="-1"></a><span class="do">## PROBIT </span></span>
+<span id="cb22-344"><a href="#cb22-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-345"><a href="#cb22-345" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-346"><a href="#cb22-346" aria-hidden="true" tabindex="-1"></a><span class="co"># fit the Probit model, assign it to `Probit_mod`</span></span>
+<span id="cb22-347"><a href="#cb22-347" aria-hidden="true" tabindex="-1"></a>Probit_mod <span class="ot">&lt;-</span> <span class="fu">glm</span>(Survived <span class="sc">~</span> ., <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"probit"</span>), <span class="at">data =</span> Titanic_2)</span>
+<span id="cb22-348"><a href="#cb22-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-349"><a href="#cb22-349" aria-hidden="true" tabindex="-1"></a><span class="co"># obtain a robust summary of the model coefficients</span></span>
+<span id="cb22-350"><a href="#cb22-350" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(Probit_mod, vcovHC)</span>
+<span id="cb22-351"><a href="#cb22-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-352"><a href="#cb22-352" aria-hidden="true" tabindex="-1"></a><span class="co"># predict the probability of survival for the hypothecial individuals</span></span>
+<span id="cb22-353"><a href="#cb22-353" aria-hidden="true" tabindex="-1"></a><span class="co">#predict(Probit_mod, newdata = data.frame("Sexmale" = as.factor(1:2)))</span></span>
+<span id="cb22-354"><a href="#cb22-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-355"><a href="#cb22-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-356"><a href="#cb22-356" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-357"><a href="#cb22-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-358"><a href="#cb22-358" aria-hidden="true" tabindex="-1"></a>The findings here align closely with those observed in the logistic regression model.</span>
+<span id="cb22-359"><a href="#cb22-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-360"><a href="#cb22-360" aria-hidden="true" tabindex="-1"></a><span class="fu">### Conclusions</span></span>
+<span id="cb22-361"><a href="#cb22-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-362"><a href="#cb22-362" aria-hidden="true" tabindex="-1"></a>In summary, our exploration of the Titanic dataset reveals a poignant story of societal dynamics during a tragic event. Passenger class emerges as a key determinant, impacting survival odds significantly. The age-old ethos of "women and children first" echoes in the data, with children aged 0 to 5 symbolizing resilience.</span>
+<span id="cb22-363"><a href="#cb22-363" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-364"><a href="#cb22-364" aria-hidden="true" tabindex="-1"></a>Gender plays a crucial role, showcasing higher survival rates among women. As we delve into statistical models, variables like sex, age, and familial ties consistently influence survival chances. The correlation between passenger class and survival, the nuanced impact of age, and gender-specific dynamics enrich our understanding of the Titanic tragedy.</span>
+<span id="cb22-365"><a href="#cb22-365" aria-hidden="true" tabindex="-1"></a>:::</span>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+<script src="titanic_files/libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

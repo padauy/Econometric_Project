@@ -1,0 +1,16 @@
+---
+  title: Luis Antonio Pérez Padauy    #- Hay que cambiarlo
+image: my_foto.png      #- poned una foto vuestra
+about:
+  template: solana    #- {jolla, solana, ...}
+image-width: 16em     #- https://cybmeta.com/em-y-rem
+image-shape: round    #- {rectangle, round, rounded}
+links:
+  - icon: github
+text: Github
+href: https://github.com/padauy        #- Github
+---
+  
+
+My name is Luis
+
